@@ -1,8 +1,5 @@
 #!/usr/bin/make -f
 
-# FIXME: much of this can be removed once we move off of xenial/mint 18 base support
-# meson support is baked in
-
 %:
 	dh $@
 
