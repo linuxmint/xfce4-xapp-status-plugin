@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+
+# FIXME: much of this can be removed once we move off of xenial/mint 18 base support
+# meson support is baked in
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	mkdir -p debian/build
+	meson debian/build \
+		--prefix=/usr \
+		--buildtype=plain \
+		-D deprecated_warnings=false
+
+override_dh_strip:
+	dh_strip --dbg-package=xfce4-xapp-status-plugin-dbg
+
+override_dh_auto_install:
+	DESTDIR=${CURDIR}/debian/tmp \
+	ninja -C debian/build install

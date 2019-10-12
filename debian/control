@@ -1,0 +1,26 @@
+Source: xfce4-xapp-status-plugin
+Section: x11
+Priority: optional
+Maintainer: Clement Lefebvre <root@linuxmint.com>
+Build-Depends:
+ debhelper (>= 10),
+ libglib2.0-dev (>= 2.37.3),
+ libgtk-3-dev (>= 3.3.16),
+ libxapp-dev,
+ libxfce4panel-2.0-dev,
+ meson,
+Standards-Version: 3.9.6
+
+Package: xfce4-xapp-status-plugin
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: xapp status icon plugin for the Xfce4 panel
+
+Package: xfce4-xapp-status-plugin-dbg
+Section: debug
+Priority: extra
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends: xfce4-xapp-status-plugin (= ${binary:Version}), ${misc:Depends}
+Description: debug symbols for xfce4-xapp-status-plugin.
