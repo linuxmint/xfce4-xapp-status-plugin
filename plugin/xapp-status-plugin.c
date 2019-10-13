@@ -18,6 +18,7 @@
  */
 
 #include <gtk/gtk.h>
+#include <glib/gi18n-lib.h>
 
 #include <libxapp/xapp-statusicon-interface.h>
 #include <libxapp/xapp-status-icon-monitor.h>
@@ -132,6 +133,43 @@ on_icon_removed (XAppStatusIconMonitor        *monitor,
 }
 
 static void
+show_about_dialog (GtkMenuItem *item,
+                   gpointer     user_data)
+{
+    GtkAboutDialog *dialog;
+
+    dialog = GTK_ABOUT_DIALOG (gtk_about_dialog_new ());
+
+    gtk_about_dialog_set_program_name (dialog, _("XApp Status Applet"));
+    gtk_about_dialog_set_version (dialog, VERSION);
+    gtk_about_dialog_set_license_type (dialog, GTK_LICENSE_GPL_3_0);
+    gtk_about_dialog_set_website (dialog, "tbd");
+    gtk_about_dialog_set_logo_icon_name (dialog, "panel-applets");
+    gtk_about_dialog_set_comments (dialog, _("An applet for displaying XApp application status icons"));
+
+    gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (GTK_WIDGET (dialog));
+}
+
+static void
+add_about_menu_item (XAppStatusPlugin *plugin)
+{
+    GtkMenuItem *item;
+
+    item = GTK_MENU_ITEM (gtk_menu_item_new_with_label (_("About")));
+    gtk_widget_show (GTK_WIDGET (item));
+
+    g_signal_connect (item,
+                      "activate",
+                      G_CALLBACK (show_about_dialog),
+                      plugin);
+
+    xfce_panel_plugin_menu_insert_item (XFCE_PANEL_PLUGIN (plugin),
+                                        item);
+}
+
+
+static void
 xapp_status_plugin_construct (XfcePanelPlugin *panel_plugin)
 {
     XAppStatusPlugin *plugin = XAPP_STATUS_PLUGIN (panel_plugin);
@@ -150,7 +188,7 @@ xapp_status_plugin_construct (XfcePanelPlugin *panel_plugin)
                       plugin);
 
     plugin->icon_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL,
-                                    ICON_SPACING);
+                                    0);
 
     gtk_widget_show (plugin->icon_box);
     gtk_container_set_border_width (GTK_CONTAINER (plugin->icon_box),
@@ -165,6 +203,8 @@ xapp_status_plugin_construct (XfcePanelPlugin *panel_plugin)
 
     xapp_status_plugin_screen_position_changed (panel_plugin,
                                                        xfce_panel_plugin_get_orientation (panel_plugin));
+
+    add_about_menu_item (plugin);
 }
 
 /* This is our dispose */
@@ -267,4 +307,9 @@ xapp_status_plugin_class_init (XAppStatusPluginClass *klass)
   plugin_class->free_data = xapp_status_plugin_free_data;
   plugin_class->size_changed = xapp_status_plugin_size_changed;
   plugin_class->screen_position_changed = xapp_status_plugin_screen_position_changed;
+
+    /* Initialize gettext support */
+  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  textdomain (GETTEXT_PACKAGE);
 }

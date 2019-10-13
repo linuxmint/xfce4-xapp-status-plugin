@@ -17,8 +17,13 @@ xapp_status_plugin = library('xapp-status-plugin',
     version: meson.project_version(),
     soversion: 1,
     dependencies: libdeps,
-    c_args: ['-Wno-declaration-after-statement', '-DG_LOG_DOMAIN="XAppStatusPlugin"'],
-    link_args: [ '-Wl,-Bsymbolic', '-Wl,-z,relro', '-Wl,-z,now', '-lm'],
+    c_args: [
+        '-Wno-declaration-after-statement',
+        '-DG_LOG_DOMAIN="XAppStatusPlugin"',
+        '-DVERSION="@0@"'.format(meson.project_version())
+    ],
+    link_args: [ '-Wl,-Bsymbolic', '-Wl,-z,relro', '-Wl,-z,now', '-lm'
+    ],
     install: true,
     install_dir: join_paths(get_option('libdir'), 'xfce4', 'panel', 'plugins')
 )
@@ -26,10 +31,10 @@ xapp_status_plugin = library('xapp-status-plugin',
 ## Desktop file
 
 i18n.merge_file(
-  input: 'xapp-status-plugin.desktop.in',
-  output: 'xapp-status-plugin.desktop',
-  type: 'desktop',
-  po_dir: join_paths(meson.source_root(), 'po'),
-  install: true,
-  install_dir: join_paths(get_option('datadir'), 'xfce4', 'panel', 'plugins')
+    input: 'xapp-status-plugin.desktop.in',
+    output: 'xapp-status-plugin.desktop',
+    type: 'desktop',
+    po_dir: join_paths(meson.source_root(), 'po'),
+    install: true,
+    install_dir: join_paths(get_option('datadir'), 'xfce4', 'panel', 'plugins')
 )

@@ -3,8 +3,6 @@ project('xfce4-xapp-status-plugin',
     version : '1.0'
 )
 
-gettext_package = meson.project_name()
-
 gnome = import('gnome')
 pkg = import('pkgconfig')
 i18n = import('i18n')
@@ -26,7 +24,11 @@ if not get_option('deprecated_warnings')
   )
 endif
 
+gettext_package = meson.project_name()
+locale_dir = join_paths(get_option('prefix'), get_option('localedir'))
+
 add_project_arguments('-DGETTEXT_PACKAGE="@0@"'.format(gettext_package), language:'c')
+add_project_arguments('-DLOCALEDIR="@0@"'.format(locale_dir), language:'c')
 
 top_inc = include_directories('.')
 
