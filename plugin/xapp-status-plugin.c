@@ -62,6 +62,63 @@ xapp_status_plugin_init (XAppStatusPlugin *plugin)
                                                 g_free, g_object_unref);
 }
 
+static gint
+compare_icons (gpointer a,
+               gpointer b)
+{
+    XAppStatusIconInterface *proxy_a, *proxy_b;
+    gboolean sym_a, sym_b;
+
+    proxy_a = status_icon_get_proxy (STATUS_ICON (a));
+    proxy_b = status_icon_get_proxy (STATUS_ICON (b));
+
+    sym_a = g_strstr_len (xapp_status_icon_interface_get_icon_name (proxy_a), -1, "symbolic") != NULL;
+    sym_b = g_strstr_len (xapp_status_icon_interface_get_icon_name (proxy_b), -1, "symbolic") != NULL;
+
+    if (sym_a && !sym_b) {
+        return 1;
+    }
+
+    if (sym_b && !sym_a) {
+        return -1;
+    }
+
+    return g_utf8_collate (xapp_status_icon_interface_get_name (proxy_a),
+                           xapp_status_icon_interface_get_name (proxy_b));
+}
+
+static void
+sort_icons (XAppStatusPlugin *plugin)
+{
+    GList *unordered_icons, *icons, *iter;
+
+    unordered_icons = g_hash_table_get_values (plugin->lookup_table);
+
+    if (!unordered_icons)
+    {
+        return;
+    }
+
+    icons = g_list_copy (unordered_icons);
+    icons = g_list_sort (icons, (GCompareFunc) compare_icons);
+    icons = g_list_reverse (icons);
+
+    iter = icons;
+
+    while (iter)
+    {
+        StatusIcon *icon = STATUS_ICON (iter->data);
+
+        gtk_box_reorder_child (GTK_BOX (plugin->icon_box),
+                               GTK_WIDGET (icon),
+                               0);
+
+        iter = iter->next;
+    }
+
+    g_list_free (icons);
+}
+
 static void
 on_icon_added (XAppStatusIconMonitor        *monitor,
                XAppStatusIconInterface      *proxy,
@@ -92,6 +149,8 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
     g_hash_table_insert (plugin->lookup_table,
                          g_strdup (name),
                          icon);
+
+    sort_icons (plugin);
 
     xapp_status_plugin_size_changed (panel_plugin,
                                             xfce_panel_plugin_get_size (panel_plugin));
@@ -124,6 +183,8 @@ on_icon_removed (XAppStatusIconMonitor        *monitor,
 
     g_hash_table_remove (plugin->lookup_table,
                          name);
+
+    sort_icons (plugin);
 
     xapp_status_plugin_size_changed (XFCE_PANEL_PLUGIN (plugin),
                                             xfce_panel_plugin_get_size (panel_plugin));

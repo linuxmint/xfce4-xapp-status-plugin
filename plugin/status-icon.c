@@ -149,7 +149,7 @@ do_idle_untoggle (StatusIcon *icon)
 
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (icon), FALSE);
 
-    return FALSE;
+    return G_SOURCE_REMOVE;
 }
 
 static gboolean
@@ -179,6 +179,8 @@ on_button_press_event (GtkWidget *widget,
         return GDK_EVENT_PROPAGATE;
     }
 
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), TRUE);
+
     return GDK_EVENT_STOP;
 }
 
@@ -204,7 +206,7 @@ on_button_release_event (GtkWidget *widget,
                                                     NULL,
                                                     NULL);
 
-    g_idle_add ((GSourceFunc) do_idle_untoggle, icon);
+    g_timeout_add (200, (GSourceFunc) do_idle_untoggle, icon);
 
     return GDK_EVENT_PROPAGATE;
 }
@@ -300,6 +302,8 @@ status_icon_new (XAppStatusIconInterface *proxy)
 void
 status_icon_set_size (StatusIcon *icon, gint size)
 {
+    g_return_if_fail (STATUS_IS_ICON (icon));
+
     if (icon->size == size)
     {
         return;
@@ -313,6 +317,8 @@ status_icon_set_size (StatusIcon *icon, gint size)
 void
 status_icon_set_orientation (StatusIcon *icon, GtkPositionType orientation)
 {
+    g_return_if_fail (STATUS_IS_ICON (icon));
+
     if (icon->orientation == orientation)
     {
         return;
@@ -321,4 +327,12 @@ status_icon_set_orientation (StatusIcon *icon, GtkPositionType orientation)
     icon->orientation = orientation;
 
     update_orientation (icon);
+}
+
+XAppStatusIconInterface *
+status_icon_get_proxy (StatusIcon *icon)
+{
+    g_return_val_if_fail (STATUS_IS_ICON (icon), NULL);
+
+    return icon->proxy;
 }
