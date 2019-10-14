@@ -201,12 +201,12 @@ show_about_dialog (GtkMenuItem *item,
 
     dialog = GTK_ABOUT_DIALOG (gtk_about_dialog_new ());
 
-    gtk_about_dialog_set_program_name (dialog, _("XApp Status Applet"));
+    gtk_about_dialog_set_program_name (dialog, _("XApp Status Plugin"));
     gtk_about_dialog_set_version (dialog, VERSION);
     gtk_about_dialog_set_license_type (dialog, GTK_LICENSE_GPL_3_0);
-    gtk_about_dialog_set_website (dialog, "tbd");
+    gtk_about_dialog_set_website (dialog, "https://www.github.com/linuxmint/xfce4-xapp-status-plugin");
     gtk_about_dialog_set_logo_icon_name (dialog, "panel-applets");
-    gtk_about_dialog_set_comments (dialog, _("An applet for displaying XApp application status icons"));
+    gtk_about_dialog_set_comments (dialog, _("Area where XApp Status icons appear"));
 
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (GTK_WIDGET (dialog));

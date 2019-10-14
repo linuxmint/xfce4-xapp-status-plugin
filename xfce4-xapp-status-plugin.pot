@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-12 10:23-0400\n"
+"POT-Creation-Date: 2019-10-14 16:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,10 +17,14 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: plugin/xapp-status-plugin.desktop.in:4
-msgid "XFCE XApp Status Plugin"
+#: plugin/xapp-status-plugin.c:204 plugin/xapp-status-plugin.desktop.in:4
+msgid "XApp Status Plugin"
 msgstr ""
 
-#: plugin/xapp-status-plugin.desktop.in:5
-msgid "Allows XAppStatusIcons to display in the panel"
+#: plugin/xapp-status-plugin.c:209 plugin/xapp-status-plugin.desktop.in:5
+msgid "Area where XApp Status icons appear"
+msgstr ""
+
+#: plugin/xapp-status-plugin.c:220
+msgid "About"
 msgstr ""
