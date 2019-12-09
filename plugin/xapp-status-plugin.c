@@ -141,7 +141,6 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
     }
 
     icon = status_icon_new (proxy);
-    gtk_widget_show (GTK_WIDGET (icon));
 
     gtk_container_add (GTK_CONTAINER (plugin->icon_box),
                        GTK_WIDGET (icon));
