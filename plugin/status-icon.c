@@ -289,12 +289,12 @@ status_icon_new (XAppStatusIconInterface *proxy)
     StatusIcon *icon = g_object_new (STATUS_TYPE_ICON, NULL);
     icon->proxy = g_object_ref (proxy);
 
+    gtk_widget_show_all (GTK_WIDGET (icon));
+
     bind_props_and_signals (icon);
 
     update_orientation (icon);
     update_image (icon);
-
-    gtk_widget_show_all (GTK_WIDGET (icon));
 
     return icon;
 }
