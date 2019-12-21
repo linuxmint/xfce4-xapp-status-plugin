@@ -4,7 +4,7 @@ libdeps = []
 libdeps += dependency('libxfce4panel-2.0', version: '>=4.12.2', required: true)
 libdeps += dependency('glib-2.0', version: glib_min_ver, required: true)
 libdeps += dependency('gtk+-3.0', version: '>=3.3.16', required: true)
-libdeps += dependency('xapp', version: '>=1.4.9', required: true)
+libdeps += dependency('xapp', version: '>=1.6.0', required: true)
 
 xfce_plugin_sources = [
     'xapp-status-plugin.c',
