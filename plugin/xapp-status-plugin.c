@@ -140,7 +140,8 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
         return;
     }
 
-    icon = status_icon_new (proxy);
+    icon = status_icon_new (proxy,
+                            xfce_panel_plugin_get_icon_size (panel_plugin));
 
     gtk_container_add (GTK_CONTAINER (plugin->icon_box),
                        GTK_WIDGET (icon));
@@ -152,7 +153,7 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
     sort_icons (plugin);
 
     xapp_status_plugin_size_changed (panel_plugin,
-                                            xfce_panel_plugin_get_size (panel_plugin));
+                                     xfce_panel_plugin_get_size (panel_plugin));
 
     xapp_status_plugin_screen_position_changed (panel_plugin,
                                                        xfce_panel_plugin_get_screen_position (panel_plugin));

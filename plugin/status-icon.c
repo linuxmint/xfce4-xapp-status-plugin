@@ -17,9 +17,124 @@ struct _StatusIcon
     GtkWidget *box;
     GtkWidget *image;
     GtkWidget *label;
+
+    GCancellable *image_load_cancellable;
 };
 
 G_DEFINE_TYPE (StatusIcon, status_icon, GTK_TYPE_TOGGLE_BUTTON)
+
+#define VERTICAL_PANEL(o) (o == GTK_POS_LEFT || o == GTK_POS_RIGHT)
+
+typedef struct {
+  gchar *path;
+  gint   width, height, scale;
+} ImageFromFileAsyncData;
+
+static void
+on_image_from_file_data_destroy (gpointer data)
+{
+  ImageFromFileAsyncData *d = (ImageFromFileAsyncData *)data;
+  g_free (d->path);
+  g_free (d);
+}
+
+static void
+on_image_from_file_loaded (GObject      *source,
+                           GAsyncResult *res,
+                           gpointer      user_data)
+{
+    StatusIcon *icon = STATUS_ICON (user_data);
+    GTask *task = G_TASK (res);
+    GdkPixbuf *pixbuf;
+    cairo_surface_t *surface;
+    GError *error;
+    ImageFromFileAsyncData *data;
+
+    data = (ImageFromFileAsyncData *) g_task_get_task_data (task);
+    error = NULL;
+
+    pixbuf = g_task_propagate_pointer (task, &error);
+
+    g_clear_object (&icon->image_load_cancellable);
+
+    if (error)
+    {
+        if (error->code != G_IO_ERROR_CANCELLED)
+        {
+            g_warning ("Could not load image from file: %s\n", error->message);
+            g_error_free (error);
+        }
+
+        return;
+    }
+
+    surface = gdk_cairo_surface_create_from_pixbuf (pixbuf,
+                                                    data->scale,
+                                                    gtk_widget_get_window (GTK_WIDGET (icon)));
+
+    g_object_unref (pixbuf);
+
+    gtk_image_set_pixel_size (GTK_IMAGE (icon->image), -1);
+    gtk_image_set_from_surface (GTK_IMAGE (icon->image), surface);
+
+    cairo_surface_destroy (surface);
+}
+
+static void
+load_image_from_file_thread (GTask        *task,
+                             gpointer      source,
+                             gpointer      task_data,
+                             GCancellable *cancellable)
+{
+    ImageFromFileAsyncData *data;
+    GdkPixbuf *pixbuf;
+    GError *error;
+
+    data = task_data;
+    error = NULL;
+
+    /* Pixbuf size is multiplied by the ui scale */
+    pixbuf = gdk_pixbuf_new_from_file_at_scale (data->path,
+                                                data->width > 0 ? data->width * data->scale : -1,
+                                                data->height > 0 ? data->height * data->scale : -1,
+                                                TRUE,
+                                                &error);
+
+    if (error)
+    {
+        g_task_return_error (task, error);
+    }
+
+    g_task_return_pointer (task, pixbuf, NULL);
+}
+
+static void
+load_file_based_image (StatusIcon  *icon,
+                       const gchar *path)
+{
+
+    ImageFromFileAsyncData *data;
+    GTask *result;
+
+    data = g_new0 (ImageFromFileAsyncData, 1);
+    // I can't imagine supporting a vertical panel somehow.. but it's here in case.
+    data->width = -1;
+    data->height = icon->size;
+    data->scale = gtk_widget_get_scale_factor (GTK_WIDGET (icon));
+    data->path = g_strdup (path);
+
+    icon->image_load_cancellable = g_cancellable_new ();
+
+    result = g_task_new (icon,
+                         icon->image_load_cancellable,
+                         on_image_from_file_loaded,
+                         icon);
+
+    g_task_set_task_data (result, data, on_image_from_file_data_destroy);
+    g_task_run_in_thread (result, load_image_from_file_thread);
+
+    g_object_unref (result);
+}
 
 static void
 update_image (StatusIcon *icon)
@@ -28,16 +143,6 @@ update_image (StatusIcon *icon)
 
     GIcon *gicon;
     const gchar *icon_name;
-    gint size;
-
-    size = icon->size;
-
-    if (size % 2 != 0)
-    {
-        size--;
-    }
-
-    gtk_image_set_pixel_size (GTK_IMAGE (icon->image), size);
 
     icon_name = xapp_status_icon_interface_get_icon_name (XAPP_STATUS_ICON_INTERFACE (icon->proxy));
     gicon = NULL;
@@ -49,10 +154,17 @@ update_image (StatusIcon *icon)
 
     if (g_file_test (icon_name, G_FILE_TEST_EXISTS))
     {
-        GFile *icon_file = g_file_new_for_path (icon_name);
-        gicon = G_ICON (g_file_icon_new (icon_file));
-
-        g_object_unref (icon_file);
+        if (g_str_has_suffix (icon_name, "symbolic") || VERTICAL_PANEL (icon->orientation))
+        {
+            GFile *icon_file = g_file_new_for_path (icon_name);
+            gicon = G_ICON (g_file_icon_new (icon_file));
+            g_object_unref (icon_file);
+        }
+        else
+        {
+            load_file_based_image(icon, icon_name);
+            return;
+        }
     }
     else
     {
@@ -64,6 +176,8 @@ update_image (StatusIcon *icon)
 
         }
     }
+
+    gtk_image_set_pixel_size (GTK_IMAGE (icon->image), icon->size);
 
     if (gicon)
     {
@@ -329,26 +443,15 @@ bind_props_and_signals (StatusIcon *icon)
     g_signal_connect (GTK_WIDGET (icon), "scroll-event", G_CALLBACK (on_scroll_event), NULL);
 }
 
-StatusIcon *
-status_icon_new (XAppStatusIconInterface *proxy)
-{
-    StatusIcon *icon = g_object_new (STATUS_TYPE_ICON, NULL);
-    icon->proxy = g_object_ref (proxy);
-
-    gtk_widget_show_all (GTK_WIDGET (icon));
-
-    bind_props_and_signals (icon);
-
-    update_orientation (icon);
-    update_image (icon);
-
-    return icon;
-}
-
 void
 status_icon_set_size (StatusIcon *icon, gint size)
 {
     g_return_if_fail (STATUS_IS_ICON (icon));
+
+    if (size % 2 != 0)
+    {
+        size--;
+    }
 
     if (icon->size == size)
     {
@@ -382,4 +485,20 @@ status_icon_get_proxy (StatusIcon *icon)
     g_return_val_if_fail (STATUS_IS_ICON (icon), NULL);
 
     return icon->proxy;
+}
+
+StatusIcon *
+status_icon_new (XAppStatusIconInterface *proxy,
+                 gint                     icon_size)
+{
+    StatusIcon *icon = g_object_new (STATUS_TYPE_ICON, NULL);
+    icon->proxy = g_object_ref (proxy);
+
+    gtk_widget_show_all (GTK_WIDGET (icon));
+    bind_props_and_signals (icon);
+
+    update_orientation (icon);
+    status_icon_set_size (icon, icon_size);
+
+    return icon;
 }
