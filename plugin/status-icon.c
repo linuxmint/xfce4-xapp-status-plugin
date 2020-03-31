@@ -356,6 +356,7 @@ status_icon_set_size (StatusIcon *icon, gint size)
     }
 
     icon->size = size;
+    xapp_status_icon_interface_set_icon_size (icon->proxy, size);
 
     update_image (icon);
 }
