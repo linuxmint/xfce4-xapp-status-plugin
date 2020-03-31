@@ -1,6 +1,7 @@
 /* Based on gtkstackicon.c */
 
 #include "status-icon.h"
+#include <libxapp/xapp-status-icon.h>
 
 struct _StatusIcon
 {
@@ -211,12 +212,56 @@ on_button_release_event (GtkWidget *widget,
     return GDK_EVENT_PROPAGATE;
 }
 
+static gboolean
+on_scroll_event (GtkWidget *widget,
+                 GdkEvent  *event,
+                 gpointer   user_data)
+{
+    StatusIcon *icon = STATUS_ICON (widget);
+    GdkScrollDirection direction;
+    XAppScrollDirection x_dir = XAPP_SCROLL_UP;
+    gint delta = 0;
+
+    if (gdk_event_get_scroll_direction (event, &direction))
+    {
+        x_dir = direction;
+
+        switch (direction)
+        {
+            case GDK_SCROLL_UP:
+                delta = -1;
+                break;
+            case GDK_SCROLL_DOWN:
+                delta = 1;
+                break;
+            case GDK_SCROLL_LEFT:
+                delta = -1;
+                break;
+            case GDK_SCROLL_RIGHT:
+                delta = 1;
+                break;
+        }
+    }
+
+    xapp_status_icon_interface_call_scroll (icon->proxy,
+                                            delta,
+                                            x_dir,
+                                            event->button.time,
+                                            NULL,
+                                            NULL,
+                                            NULL);
+
+    return GDK_EVENT_PROPAGATE;
+}
+
 static void
 status_icon_init (StatusIcon *icon)
 {
     GtkStyleContext *context;
     GtkCssProvider  *provider;
     icon->box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+
+    gtk_widget_add_events (GTK_WIDGET (icon), GDK_SCROLL_MASK);
 
     gtk_container_add (GTK_CONTAINER (icon), icon->box);
 
@@ -281,6 +326,7 @@ bind_props_and_signals (StatusIcon *icon)
     g_signal_connect_swapped (icon->proxy, "notify::icon-name", G_CALLBACK (update_image), icon);
     g_signal_connect (GTK_WIDGET (icon), "button-press-event", G_CALLBACK (on_button_press_event), NULL);
     g_signal_connect (GTK_WIDGET (icon), "button-release-event", G_CALLBACK (on_button_release_event), NULL);
+    g_signal_connect (GTK_WIDGET (icon), "scroll-event", G_CALLBACK (on_scroll_event), NULL);
 }
 
 StatusIcon *
