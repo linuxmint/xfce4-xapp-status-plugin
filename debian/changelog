@@ -1,3 +1,12 @@
+xfce4-xapp-status-plugin (0.1.5) ulyana; urgency=medium
+
+  [ Michael Webster ]
+  * Add scrolling support.
+  * status-icon.c: Set the proxy icon size hint (used by the status notifier watcher).
+  * Support irregularly-shaped images.
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 23 Apr 2020 15:58:30 +0100
+
 xfce4-xapp-status-plugin (0.1.4) tricia; urgency=medium
 
   * l10n: Update translations
