@@ -1,5 +1,7 @@
 /* Based on gtkstackicon.c */
 
+#include <json-glib/json-glib.h>
+
 #include "status-icon.h"
 #include <libxapp/xapp-status-icon.h>
 
@@ -17,6 +19,9 @@ struct _StatusIcon
     GtkWidget *box;
     GtkWidget *image;
     GtkWidget *label;
+
+    gboolean highlight_both_menus;
+    gboolean menu_opened;
 
     GCancellable *image_load_cancellable;
 };
@@ -257,14 +262,31 @@ update_orientation (StatusIcon *icon)
     }
 }
 
-static gboolean
-do_idle_untoggle (StatusIcon *icon)
+static void
+menu_visible_changed (XAppStatusIconInterface *proxy,
+                      GParamSpec              *pspec,
+                      gpointer                 user_data)
 {
-    g_return_val_if_fail (STATUS_IS_ICON (icon), G_SOURCE_REMOVE);
+    StatusIcon *icon = STATUS_ICON (user_data);
+    gboolean menu_prop_is_opened;
 
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (icon), FALSE);
+    if (g_strcmp0 (g_param_spec_get_name (pspec), "primary-menu-is-open") == 0)
+    {
+        menu_prop_is_opened = xapp_status_icon_interface_get_primary_menu_is_open (proxy);
+    }
+    else
+    {
+        menu_prop_is_opened = xapp_status_icon_interface_get_secondary_menu_is_open (proxy);
+    }
 
-    return G_SOURCE_REMOVE;
+    if (!icon->menu_opened || !menu_prop_is_opened)
+    {
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (icon), FALSE);
+        return;
+    }
+
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (icon), menu_prop_is_opened);
+    icon->menu_opened = FALSE;
 }
 
 static gboolean
@@ -278,6 +300,8 @@ on_button_press_event (GtkWidget *widget,
     x = 0;
     y = 0;
 
+    icon->menu_opened = FALSE;
+
     calculate_proxy_args (icon, &x, &y);
 
     xapp_status_icon_interface_call_button_press (icon->proxy,
@@ -288,13 +312,6 @@ on_button_press_event (GtkWidget *widget,
                                                   NULL,
                                                   NULL,
                                                   NULL);
-
-    if (event->button.button == GDK_BUTTON_PRIMARY)
-    {
-        return GDK_EVENT_PROPAGATE;
-    }
-
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), TRUE);
 
     return GDK_EVENT_STOP;
 }
@@ -321,7 +338,11 @@ on_button_release_event (GtkWidget *widget,
                                                     NULL,
                                                     NULL);
 
-    g_timeout_add (200, (GSourceFunc) do_idle_untoggle, icon);
+    if (event->button.button == GDK_BUTTON_PRIMARY ||
+        (event->button.button == GDK_BUTTON_SECONDARY && icon->highlight_both_menus))
+    {
+        icon->menu_opened = TRUE;
+    }
 
     return GDK_EVENT_PROPAGATE;
 }
@@ -437,10 +458,57 @@ bind_props_and_signals (StatusIcon *icon)
     g_object_bind_property (icon->proxy, "tooltip-text", GTK_BUTTON (icon), "tooltip-text", flags);
     g_object_bind_property (icon->proxy, "visible", GTK_BUTTON (icon), "visible", flags);
 
+    g_signal_connect (icon->proxy, "notify::primary-menu-is-open", G_CALLBACK (menu_visible_changed), icon);
+    g_signal_connect (icon->proxy, "notify::secondary-menu-is-open", G_CALLBACK (menu_visible_changed), icon);
     g_signal_connect_swapped (icon->proxy, "notify::icon-name", G_CALLBACK (update_image), icon);
+
     g_signal_connect (GTK_WIDGET (icon), "button-press-event", G_CALLBACK (on_button_press_event), NULL);
     g_signal_connect (GTK_WIDGET (icon), "button-release-event", G_CALLBACK (on_button_release_event), NULL);
     g_signal_connect (GTK_WIDGET (icon), "scroll-event", G_CALLBACK (on_scroll_event), NULL);
+}
+
+static void
+load_metadata (StatusIcon *icon)
+{
+    g_autoptr (JsonParser) parser = NULL;
+    GError *error;
+    JsonNode *root, *child;
+    JsonObject *dict;
+    JsonObjectIter iter;
+    const gchar *data, *child_name;
+
+    data = xapp_status_icon_interface_get_metadata (icon->proxy);
+
+    if (data == NULL || data[0] == '\0')
+    {
+        return;
+    }
+
+    parser = json_parser_new ();
+    error = NULL;
+
+    if (!json_parser_load_from_data (parser, data, -1, &error))
+    {
+        g_warning ("Could not parse icon metadata: %s\n", error->message);
+        g_error_free (error);
+        return;
+    }
+
+    root = json_parser_get_root (parser);
+
+    g_return_if_fail (JSON_NODE_TYPE (root) == JSON_NODE_OBJECT);
+
+    dict = json_node_get_object (root);
+
+    json_object_iter_init (&iter, dict);
+
+    while (json_object_iter_next (&iter, &child_name, &child))
+    {
+        if (g_strcmp0 (child_name, "highlight-both-menus") == 0)
+        {
+            icon->highlight_both_menus = json_node_get_boolean (child);
+        }
+    }
 }
 
 void
@@ -496,6 +564,7 @@ status_icon_new (XAppStatusIconInterface *proxy,
 
     gtk_widget_show_all (GTK_WIDGET (icon));
     bind_props_and_signals (icon);
+    load_metadata (icon);
 
     update_orientation (icon);
     status_icon_set_size (icon, icon_size);

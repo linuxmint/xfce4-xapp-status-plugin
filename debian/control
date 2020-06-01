@@ -6,7 +6,8 @@ Build-Depends:
  debhelper (>= 10),
  libglib2.0-dev (>= 2.37.3),
  libgtk-3-dev (>= 3.3.16),
- libxapp-dev (>= 1.8.0),
+ libjson-glib-dev(>= 1.4.2),
+ libxapp-dev (>= 1.8.7),
  libxfce4panel-2.0-dev,
  meson,
 Standards-Version: 3.9.6
