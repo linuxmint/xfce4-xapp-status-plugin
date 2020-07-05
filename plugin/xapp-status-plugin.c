@@ -150,6 +150,7 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
                          g_strdup (name),
                          icon);
 
+    g_signal_connect_swapped (icon, "re-sort", G_CALLBACK (sort_icons), plugin);
     sort_icons (plugin);
 
     xapp_status_plugin_size_changed (panel_plugin,

@@ -5,6 +5,14 @@
 #include "status-icon.h"
 #include <libxapp/xapp-status-icon.h>
 
+enum
+{
+    RE_SORT,
+    LAST_SIGNAL
+};
+
+static guint signals[LAST_SIGNAL] = {0, };
+
 struct _StatusIcon
 {
     GtkToggleButton parent_instance;
@@ -34,6 +42,14 @@ typedef struct {
   gchar *path;
   gint   width, height, scale;
 } ImageFromFileAsyncData;
+
+static void
+sortable_name_changed (gpointer data)
+{
+    StatusIcon *icon = STATUS_ICON (icon);
+
+    g_signal_emit (icon, signals[RE_SORT], 0);
+}
 
 static void
 on_image_from_file_data_destroy (gpointer data)
@@ -430,6 +446,7 @@ status_icon_dispose (GObject *object)
     StatusIcon *icon = STATUS_ICON (object);
 
     g_clear_object (&icon->proxy);
+    g_clear_object (&icon->image_load_cancellable);
 
     G_OBJECT_CLASS (status_icon_parent_class)->dispose (object);
 }
@@ -447,6 +464,14 @@ status_icon_class_init (StatusIconClass *klass)
 
     object_class->dispose = status_icon_dispose;
     object_class->finalize = status_icon_finalize;
+
+    signals [RE_SORT] =
+    g_signal_new ("re-sort",
+                  STATUS_TYPE_ICON,
+                  G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
+                  0,
+                  NULL, NULL, NULL,
+                  G_TYPE_NONE, 0);
 }
 
 static void
@@ -461,6 +486,7 @@ bind_props_and_signals (StatusIcon *icon)
     g_signal_connect (icon->proxy, "notify::primary-menu-is-open", G_CALLBACK (menu_visible_changed), icon);
     g_signal_connect (icon->proxy, "notify::secondary-menu-is-open", G_CALLBACK (menu_visible_changed), icon);
     g_signal_connect_swapped (icon->proxy, "notify::icon-name", G_CALLBACK (update_image), icon);
+    g_signal_connect_swapped (icon->proxy, "notify::name", G_CALLBACK (sortable_name_changed), icon);
 
     g_signal_connect (GTK_WIDGET (icon), "button-press-event", G_CALLBACK (on_button_press_event), NULL);
     g_signal_connect (GTK_WIDGET (icon), "button-release-event", G_CALLBACK (on_button_release_event), NULL);
