@@ -62,12 +62,22 @@ xapp_status_plugin_init (XAppStatusPlugin *plugin)
                                                 g_free, g_object_unref);
 }
 
+static gchar *
+get_unique_key (GDBusProxy *proxy)
+{
+    const gchar *name = xapp_status_icon_interface_get_name (XAPP_STATUS_ICON_INTERFACE (proxy));
+    const gchar *path = g_dbus_proxy_get_object_path (G_DBUS_PROXY (proxy));
+
+    return g_strconcat (name, path, NULL);
+}
+
 static gint
 compare_icons (gpointer a,
                gpointer b)
 {
     XAppStatusIconInterface *proxy_a, *proxy_b;
     gboolean sym_a, sym_b;
+    gint res;
 
     proxy_a = status_icon_get_proxy (STATUS_ICON (a));
     proxy_b = status_icon_get_proxy (STATUS_ICON (b));
@@ -75,16 +85,35 @@ compare_icons (gpointer a,
     sym_a = g_strstr_len (xapp_status_icon_interface_get_icon_name (proxy_a), -1, "symbolic") != NULL;
     sym_b = g_strstr_len (xapp_status_icon_interface_get_icon_name (proxy_b), -1, "symbolic") != NULL;
 
-    if (sym_a && !sym_b) {
+    if (sym_a && !sym_b)
+    {
         return 1;
     }
 
-    if (sym_b && !sym_a) {
+    if (sym_b && !sym_a)
+    {
         return -1;
     }
 
-    return g_utf8_collate (xapp_status_icon_interface_get_name (proxy_a),
-                           xapp_status_icon_interface_get_name (proxy_b));
+    res = g_utf8_collate (xapp_status_icon_interface_get_name (proxy_a),
+                          xapp_status_icon_interface_get_name (proxy_b));
+
+    if (res != 0)
+    {
+        return res;
+    }
+
+    gchar *key_a, *key_b;
+
+    key_a = get_unique_key (G_DBUS_PROXY (proxy_a));
+    key_b = get_unique_key (G_DBUS_PROXY (proxy_b));
+
+    res = g_utf8_collate (key_a, key_b);
+
+    g_free (key_a);
+    g_free (key_b);
+
+    return res;
 }
 
 static void
@@ -127,12 +156,11 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
     XAppStatusPlugin *plugin = XAPP_STATUS_PLUGIN (user_data);
     XfcePanelPlugin *panel_plugin = XFCE_PANEL_PLUGIN (plugin);
     StatusIcon *icon;
-    const gchar *name;
+    gchar *key;
 
-    name = xapp_status_icon_interface_get_name (XAPP_STATUS_ICON_INTERFACE (proxy));
-
+    key = get_unique_key (G_DBUS_PROXY (proxy));
     icon = g_hash_table_lookup (plugin->lookup_table,
-                                name);
+                                key);
 
     if (icon)
     {
@@ -147,8 +175,10 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
                        GTK_WIDGET (icon));
 
     g_hash_table_insert (plugin->lookup_table,
-                         g_strdup (name),
+                         g_strdup (key),
                          icon);
+
+    g_free (key);
 
     g_signal_connect_swapped (icon, "re-sort", G_CALLBACK (sort_icons), plugin);
     sort_icons (plugin);
@@ -157,7 +187,7 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
                                      xfce_panel_plugin_get_size (panel_plugin));
 
     xapp_status_plugin_screen_position_changed (panel_plugin,
-                                                       xfce_panel_plugin_get_screen_position (panel_plugin));
+                                                xfce_panel_plugin_get_screen_position (panel_plugin));
 }
 
 static void
@@ -168,11 +198,11 @@ on_icon_removed (XAppStatusIconMonitor        *monitor,
     XAppStatusPlugin *plugin = XAPP_STATUS_PLUGIN (user_data);
     XfcePanelPlugin *panel_plugin = XFCE_PANEL_PLUGIN (plugin);
     StatusIcon *icon;
-    const gchar *name;
+    gchar *key;
 
-    name = xapp_status_icon_interface_get_name (XAPP_STATUS_ICON_INTERFACE (proxy));
+    key = get_unique_key (G_DBUS_PROXY (proxy));
     icon = g_hash_table_lookup (plugin->lookup_table,
-                                name);
+                                key);
 
     if (!icon)
     {
@@ -183,7 +213,9 @@ on_icon_removed (XAppStatusIconMonitor        *monitor,
                           GTK_WIDGET (icon));
 
     g_hash_table_remove (plugin->lookup_table,
-                         name);
+                         key);
+
+    g_free (key);
 
     sort_icons (plugin);
 
