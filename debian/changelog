@@ -1,3 +1,10 @@
+xfce4-xapp-status-plugin (0.2.1) ulyssa; urgency=medium
+
+  [ Michael Webster ]
+  * Use the proxy name+path to generate hashtable keys, since names alone will no longer guarantee uniqueness.
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 30 Nov 2020 11:19:36 +0000
+
 xfce4-xapp-status-plugin (0.2.0) ulyana; urgency=medium
 
   [ Michael Webster ]
