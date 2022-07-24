@@ -1,16 +1,16 @@
-# Interlingua translation for linuxmint
-# Copyright (c) 2019 Rosetta Contributors and Canonical Ltd 2019
+# English (Canada) translation for linuxmint
+# Copyright (c) 2022 Rosetta Contributors and Canonical Ltd 2022
 # This file is distributed under the same license as the linuxmint package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxmint\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2019-10-14 16:48+0100\n"
-"PO-Revision-Date: 2020-07-11 03:33+0000\n"
-"Last-Translator: karm <melo@carmu.com>\n"
-"Language-Team: Interlingua <ia@li.org>\n"
+"PO-Revision-Date: 2022-07-12 09:50+0000\n"
+"Last-Translator: Dawid Wiktor <Unknown>\n"
+"Language-Team: English (Canada) <en_CA@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,12 +19,12 @@ msgstr ""
 
 #: plugin/xapp-status-plugin.c:204 plugin/xapp-status-plugin.desktop.in:4
 msgid "XApp Status Plugin"
-msgstr "Plugin de  stato de  XApp"
+msgstr "XApp Status Plugin"
 
 #: plugin/xapp-status-plugin.c:209 plugin/xapp-status-plugin.desktop.in:5
 msgid "Area where XApp Status icons appear"
-msgstr "Area ubi appare le icones de"
+msgstr "Area where XApp Status icons appear"
 
 #: plugin/xapp-status-plugin.c:220
 msgid "About"
-msgstr "A  proposito"
+msgstr "About"
