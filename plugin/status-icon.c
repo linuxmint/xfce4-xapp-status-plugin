@@ -46,7 +46,7 @@ typedef struct {
 static void
 sortable_name_changed (gpointer data)
 {
-    StatusIcon *icon = STATUS_ICON (icon);
+    StatusIcon *icon = STATUS_ICON (data);
 
     g_signal_emit (icon, signals[RE_SORT], 0);
 }
@@ -391,16 +391,21 @@ on_scroll_event (GtkWidget *widget,
             case GDK_SCROLL_RIGHT:
                 delta = 1;
                 break;
+            default:
+                break;
         }
     }
 
-    xapp_status_icon_interface_call_scroll (icon->proxy,
-                                            delta,
-                                            x_dir,
-                                            event->button.time,
-                                            NULL,
-                                            NULL,
-                                            NULL);
+    if (delta != 0)
+    {
+        xapp_status_icon_interface_call_scroll (icon->proxy,
+                                                delta,
+                                                x_dir,
+                                                event->button.time,
+                                                NULL,
+                                                NULL,
+                                                NULL);
+    }
 
     return GDK_EVENT_PROPAGATE;
 }
