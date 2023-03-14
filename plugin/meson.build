@@ -12,11 +12,9 @@ xfce_plugin_sources = [
     'status-icon.c',
 ]
 
-xapp_status_plugin = library('xapp-status-plugin',
+xapp_status_plugin = shared_module('xapp-status-plugin',
     sources  : xfce_plugin_sources,
     include_directories: [top_inc],
-    version: meson.project_version(),
-    soversion: 1,
     dependencies: libdeps,
     c_args: [
         '-Wno-declaration-after-statement',
