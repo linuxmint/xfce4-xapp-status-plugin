@@ -1,0 +1,7 @@
+debian/xfce4-xapp-status-plugin
+debian/tmp
+debian/.debhelper
+debian/files
+debian/xfce4-xapp-status-plugin-dbg*
+debian/*.substvars
+debian/*debhelper*
