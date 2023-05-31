@@ -1,3 +1,13 @@
+xfce4-xapp-status-plugin (0.3.0) victoria; urgency=medium
+
+  [ Michael Webster ]
+  * meson: Build a shared module, not a shared library.
+  * Fix build warnings.
+  * Clean up debian build.
+  * Add github workflow, .gitignore.
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 31 May 2023 13:21:52 +0100
+
 xfce4-xapp-status-plugin (0.2.9) vera; urgency=medium
 
   * l10n: Update translations
