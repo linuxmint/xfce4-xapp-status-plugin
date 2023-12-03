@@ -8,22 +8,23 @@ msgstr ""
 "Project-Id-Version: linuxmint\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2019-10-14 16:48+0100\n"
-"PO-Revision-Date: 2020-06-10 08:36+0000\n"
-"Last-Translator: goma1661 <Unknown>\n"
+"PO-Revision-Date: 2023-12-02 11:03+0000\n"
+"Last-Translator: kmyyfz8q <Unknown>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2023-06-08 10:22+0000\n"
-"X-Generator: Launchpad (build 620cd5280e3a973662e263ebf9346837ed657a46)\n"
+"X-Launchpad-Export-Date: 2023-12-03 13:34+0000\n"
+"X-Generator: Launchpad (build 886068b1e1d10de444fbd53b0c7d3f6d4fb3e658)\n"
+"Language: ja\n"
 
 #: plugin/xapp-status-plugin.c:204 plugin/xapp-status-plugin.desktop.in:4
 msgid "XApp Status Plugin"
-msgstr "XApp Status Plugin"
+msgstr "XApp の状態プラグイン"
 
 #: plugin/xapp-status-plugin.c:209 plugin/xapp-status-plugin.desktop.in:5
 msgid "Area where XApp Status icons appear"
-msgstr "XApp ステータスアイコンの表示場所"
+msgstr "XApp の状態アイコンが表示される場所です"
 
 #: plugin/xapp-status-plugin.c:220
 msgid "About"
