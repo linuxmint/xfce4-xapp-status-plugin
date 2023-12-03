@@ -1,6 +1,6 @@
 project('xfce4-xapp-status-plugin',
     'c',
-    version : '0.3.1'
+    version : '0.3.2'
 )
 
 gnome = import('gnome')
