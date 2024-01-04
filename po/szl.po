@@ -1,16 +1,16 @@
-# Chinese (Traditional) translation for linuxmint
-# Copyright (c) 2022 Rosetta Contributors and Canonical Ltd 2022
+# Silesian translation for linuxmint
+# Copyright (c) 2023 Rosetta Contributors and Canonical Ltd 2023
 # This file is distributed under the same license as the linuxmint package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxmint\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2019-10-14 16:48+0100\n"
-"PO-Revision-Date: 2022-01-16 17:31+0000\n"
-"Last-Translator: 程政罡 <marktwtn@gmail.com>\n"
-"Language-Team: Chinese (Traditional) <zh_TW@li.org>\n"
+"PO-Revision-Date: 2023-12-26 19:11+0000\n"
+"Last-Translator: Marcin Lis <Unknown>\n"
+"Language-Team: Silesian <szl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -27,4 +27,4 @@ msgstr ""
 
 #: plugin/xapp-status-plugin.c:220
 msgid "About"
-msgstr "關於"
+msgstr "Informacyje"
