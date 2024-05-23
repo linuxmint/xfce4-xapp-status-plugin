@@ -485,7 +485,7 @@ bind_props_and_signals (StatusIcon *icon)
     guint flags = G_BINDING_DEFAULT | G_BINDING_SYNC_CREATE;
 
     g_object_bind_property (icon->proxy, "label", icon->label, "label", flags);
-    g_object_bind_property (icon->proxy, "tooltip-text", GTK_BUTTON (icon), "tooltip-text", flags);
+    g_object_bind_property (icon->proxy, "tooltip-text", GTK_BUTTON (icon), "tooltip-markup", flags);
     g_object_bind_property (icon->proxy, "visible", GTK_BUTTON (icon), "visible", flags);
 
     g_signal_connect (icon->proxy, "notify::primary-menu-is-open", G_CALLBACK (menu_visible_changed), icon);
