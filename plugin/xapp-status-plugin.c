@@ -557,6 +557,7 @@ xapp_status_plugin_size_changed (XfcePanelPlugin *panel_plugin,
 
     GHashTableIter iter;
     gpointer key, value;
+    GtkOrientation orientation = xfce_panel_plugin_get_orientation (panel_plugin);
     gint max_size;
 
     max_size = size / xfce_panel_plugin_get_nrows (panel_plugin);
@@ -568,8 +569,8 @@ xapp_status_plugin_size_changed (XfcePanelPlugin *panel_plugin,
         StatusIcon *icon = STATUS_ICON (value);
 
         gtk_widget_set_size_request (GTK_WIDGET (icon),
-                                     max_size,
-                                     max_size);
+                                     orientation == GTK_ORIENTATION_HORIZONTAL ? -1 : max_size,
+                                     orientation == GTK_ORIENTATION_VERTICAL   ? -1 : max_size);
 
         status_icon_set_size (icon,
                               get_color_icon_size (applet),
