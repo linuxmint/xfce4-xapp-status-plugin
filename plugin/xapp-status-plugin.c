@@ -27,6 +27,10 @@
 #include "xapp-status-plugin.h"
 #include "status-icon.h"
 
+#define SETTINGS_SCHEMA "org.x.apps.xfce4-status-plugin"
+#define KEY_COLOR_ICON_SIZE "color-icon-size"
+#define KEY_SYMBOLIC_ICON_SIZE "symbolic-icon-size"
+
 struct _XAppStatusPluginClass
 {
   XfcePanelPluginClass __parent__;
@@ -44,6 +48,8 @@ struct _XAppStatusPlugin
 
   /* A GtkListBox to hold our icons */
   GtkWidget *icon_box;
+
+  GSettings *settings;
 };
 
 /* define the plugin */
@@ -53,6 +59,9 @@ static gboolean xapp_status_plugin_size_changed (XfcePanelPlugin *panel_plugin,
                                                         gint             size);
 static void     xapp_status_plugin_screen_position_changed (XfcePanelPlugin   *panel_plugin,
                                                                    XfceScreenPosition position);
+static gint     get_color_icon_size (XAppStatusPlugin *plugin);
+static gint     get_symbolic_icon_size (XAppStatusPlugin *plugin);
+
 
 static void
 xapp_status_plugin_init (XAppStatusPlugin *plugin)
@@ -169,7 +178,8 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
     }
 
     icon = status_icon_new (proxy,
-                            xfce_panel_plugin_get_icon_size (panel_plugin));
+                            get_color_icon_size (plugin),
+                            get_symbolic_icon_size (plugin));
 
     gtk_container_add (GTK_CONTAINER (plugin->icon_box),
                        GTK_WIDGET (icon));
@@ -246,12 +256,111 @@ show_about_dialog (GtkMenuItem *item,
 }
 
 static void
-add_about_menu_item (XAppStatusPlugin *plugin)
+color_icon_size_changed (GtkWidget *item,
+                         gpointer   user_data)
 {
-    GtkMenuItem *item;
+    XAppStatusPlugin *plugin = XAPP_STATUS_PLUGIN (user_data);
+    gint size = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (item), "height"));
 
-    item = GTK_MENU_ITEM (gtk_menu_item_new_with_label (_("About")));
-    gtk_widget_show (GTK_WIDGET (item));
+    g_settings_set_int (plugin->settings, KEY_COLOR_ICON_SIZE, size);
+
+    xapp_status_plugin_size_changed (XFCE_PANEL_PLUGIN (plugin),
+                                     xfce_panel_plugin_get_size (XFCE_PANEL_PLUGIN (plugin)));
+}
+
+static void
+symbolic_icon_size_changed (GtkWidget *item,
+                            gpointer   user_data)
+{
+    XAppStatusPlugin *plugin = XAPP_STATUS_PLUGIN (user_data);
+    gint size = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (item), "height"));
+
+    g_settings_set_int (plugin->settings, KEY_SYMBOLIC_ICON_SIZE, size);
+
+    xapp_status_plugin_size_changed (XFCE_PANEL_PLUGIN (plugin),
+                                     xfce_panel_plugin_get_size (XFCE_PANEL_PLUGIN (plugin)));
+}
+
+typedef struct
+{
+  const gchar *label;
+  gint height;
+} IconSizeDef;
+
+static const IconSizeDef color_defs[] = {
+    { N_("Use optimal size for panel"), -1 },
+    { N_("16px"),                        16},
+    { N_("22px"),                        22},
+    { N_("24px"),                        24},
+    { N_("32px"),                        32},
+    { N_("48px"),                        48}
+};
+
+static const IconSizeDef symbolic_defs[] = {
+    { N_("10px"),                        10},
+    { N_("16px"),                        16},
+    { N_("18px"),                        18},
+    { N_("20px"),                        20},
+    { N_("24px"),                        24},
+    { N_("32px"),                        32},
+    { N_("48px"),                        48}
+};
+
+static gint
+get_color_icon_size (XAppStatusPlugin *plugin)
+{
+    gint size, panel_height;
+
+    size = g_settings_get_int (plugin->settings, KEY_COLOR_ICON_SIZE);
+    panel_height = xfce_panel_plugin_get_size (XFCE_PANEL_PLUGIN (plugin));
+
+    if (size > 0 && size < panel_height)
+    {
+        return size;
+    }
+
+    if (panel_height < 22)
+        return 16;
+    else
+    if (panel_height < 24)
+        return 22;
+    else
+    if (panel_height < 32)
+        return 24;
+    else
+    if (panel_height < 48)
+        return 32;
+
+    return 48;
+}
+
+static gint
+get_symbolic_icon_size (XAppStatusPlugin *plugin)
+{
+    gint size, panel_height;
+
+    size = g_settings_get_int (plugin->settings, KEY_SYMBOLIC_ICON_SIZE);
+    panel_height = xfce_panel_plugin_get_size (XFCE_PANEL_PLUGIN (plugin));
+
+    if (size > 0 && size < panel_height)
+    {
+        return size;
+    }
+
+    return panel_height - 4;
+}
+
+static void
+add_menu_items (XAppStatusPlugin *plugin)
+{
+    GtkWidget *item;
+    GtkWidget *submenu;
+    GtkWidget *radio_submenu;
+    gint i;
+    gint settings_size;
+
+    item = gtk_menu_item_new_with_label (_("About"));
+    gtk_widget_show (item);
 
     g_signal_connect (item,
                       "activate",
@@ -259,8 +368,87 @@ add_about_menu_item (XAppStatusPlugin *plugin)
                       plugin);
 
     xfce_panel_plugin_menu_insert_item (XFCE_PANEL_PLUGIN (plugin),
-                                        item);
+                                        GTK_MENU_ITEM (item));
+
+    item = gtk_menu_item_new_with_label (_("Icon sizes"));
+    gtk_widget_show (item);
+
+    xfce_panel_plugin_menu_insert_item (XFCE_PANEL_PLUGIN (plugin),
+                                        GTK_MENU_ITEM (item));
+
+    submenu = gtk_menu_new ();
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), GTK_WIDGET (submenu));
+
+    item = gtk_menu_item_new_with_label (_("Color"));
+    gtk_widget_show (item);
+    gtk_menu_shell_append (GTK_MENU_SHELL (submenu), item);
+
+    radio_submenu = gtk_menu_new ();
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), GTK_WIDGET (radio_submenu));
+
+    settings_size = g_settings_get_int (plugin->settings, KEY_COLOR_ICON_SIZE);
+    GSList *button_group = NULL;
+
+    for (i = 0; i < G_N_ELEMENTS (color_defs); i++)
+    {
+        GtkWidget *radio_item;
+
+        radio_item = gtk_radio_menu_item_new_with_label (button_group, color_defs[i].label);
+        g_object_set_data (G_OBJECT (radio_item), "height", GINT_TO_POINTER (color_defs[i].height));
+
+        gtk_menu_shell_append (GTK_MENU_SHELL (radio_submenu), radio_item);
+
+        g_signal_connect (radio_item,
+                          "activate",
+                          G_CALLBACK (color_icon_size_changed),
+                          plugin);
+
+        button_group = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (radio_item));
+
+        if (settings_size == color_defs[i].height)
+        {
+            gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (radio_item), TRUE);
+        }
+    }
+
+    gtk_widget_show_all (radio_submenu);
+
+    item = gtk_menu_item_new_with_label (_("Symbolic"));
+    gtk_widget_show (item);
+    gtk_menu_shell_append (GTK_MENU_SHELL (submenu), item);
+
+    radio_submenu = gtk_menu_new ();
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), GTK_WIDGET (radio_submenu));
+
+    settings_size = g_settings_get_int (plugin->settings, KEY_SYMBOLIC_ICON_SIZE);
+    button_group = NULL;
+
+    for (i = 0; i < G_N_ELEMENTS (symbolic_defs); i++)
+    {
+        GtkWidget *radio_item;
+
+        radio_item = gtk_radio_menu_item_new_with_label (button_group, symbolic_defs[i].label);
+        g_object_set_data (G_OBJECT (radio_item), "height", GINT_TO_POINTER (symbolic_defs[i].height));
+
+        gtk_menu_shell_append (GTK_MENU_SHELL (radio_submenu), radio_item);
+
+        g_signal_connect (radio_item,
+                          "activate",
+                          G_CALLBACK (symbolic_icon_size_changed),
+                          plugin);
+
+        button_group = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (radio_item));
+
+        if (settings_size == symbolic_defs[i].height)
+        {
+            gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (radio_item), TRUE);
+        }
+    }
+
+    gtk_widget_show_all (radio_submenu);
 }
+
+
 
 
 static void
@@ -298,7 +486,8 @@ xapp_status_plugin_construct (XfcePanelPlugin *panel_plugin)
     xapp_status_plugin_screen_position_changed (panel_plugin,
                                                        xfce_panel_plugin_get_orientation (panel_plugin));
 
-    add_about_menu_item (plugin);
+    plugin->settings = g_settings_new (SETTINGS_SCHEMA);
+    add_menu_items (plugin);
 }
 
 /* This is our dispose */
@@ -383,7 +572,8 @@ xapp_status_plugin_size_changed (XfcePanelPlugin *panel_plugin,
                                      max_size);
 
         status_icon_set_size (icon,
-                              xfce_panel_plugin_get_icon_size (panel_plugin));
+                              get_color_icon_size (applet),
+                              get_symbolic_icon_size (applet));
     }
 
     gtk_widget_queue_resize (GTK_WIDGET (panel_plugin));

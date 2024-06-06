@@ -37,3 +37,11 @@ i18n.merge_file(
     install: true,
     install_dir: join_paths(get_option('datadir'), 'xfce4', 'panel', 'plugins')
 )
+
+install_data('org.x.apps.xfce4-status-plugin.gschema.xml',
+    install_dir: join_paths(get_option('datadir'), 'glib-2.0', 'schemas')
+)
+
+gnome.post_install(
+    glib_compile_schemas: true
+)

@@ -17,7 +17,9 @@ struct _StatusIcon
 {
     GtkToggleButton parent_instance;
 
-    gint size;  /* Size of the panel to calculate from */
+    gint color_icon_size;
+    gint symbolic_icon_size;
+
     GtkPositionType orientation; /* Orientation of the panel */
     const gchar *name;
     const gchar *process_name;
@@ -131,7 +133,8 @@ load_image_from_file_thread (GTask        *task,
 
 static void
 load_file_based_image (StatusIcon  *icon,
-                       const gchar *path)
+                       const gchar *path,
+                       gint         icon_size)
 {
 
     ImageFromFileAsyncData *data;
@@ -140,7 +143,7 @@ load_file_based_image (StatusIcon  *icon,
     data = g_new0 (ImageFromFileAsyncData, 1);
     // I can't imagine supporting a vertical panel somehow.. but it's here in case.
     data->width = -1;
-    data->height = icon->size;
+    data->height = icon_size;
     data->scale = gtk_widget_get_scale_factor (GTK_WIDGET (icon));
     data->path = g_strdup (path);
 
@@ -164,6 +167,8 @@ update_image (StatusIcon *icon)
 
     GIcon *gicon;
     const gchar *icon_name;
+    gboolean is_symbolic = FALSE;
+    gint icon_size;
 
     icon_name = xapp_status_icon_interface_get_icon_name (XAPP_STATUS_ICON_INTERFACE (icon->proxy));
     gicon = NULL;
@@ -173,9 +178,12 @@ update_image (StatusIcon *icon)
         return;
     }
 
+    is_symbolic = !!g_strstr_len (icon_name, -1, "-symbolic");
+    icon_size = is_symbolic ? icon->symbolic_icon_size : icon->color_icon_size;
+
     if (g_file_test (icon_name, G_FILE_TEST_EXISTS))
     {
-        if (g_str_has_suffix (icon_name, "symbolic") || VERTICAL_PANEL (icon->orientation))
+        if (is_symbolic || VERTICAL_PANEL (icon->orientation))
         {
             GFile *icon_file = g_file_new_for_path (icon_name);
             gicon = G_ICON (g_file_icon_new (icon_file));
@@ -183,7 +191,7 @@ update_image (StatusIcon *icon)
         }
         else
         {
-            load_file_based_image(icon, icon_name);
+            load_file_based_image(icon, icon_name, icon_size);
             return;
         }
     }
@@ -198,7 +206,8 @@ update_image (StatusIcon *icon)
         }
     }
 
-    gtk_image_set_pixel_size (GTK_IMAGE (icon->image), icon->size);
+    gtk_image_set_pixel_size (GTK_IMAGE (icon->image),
+                              icon_size);
 
     if (gicon)
     {
@@ -543,22 +552,14 @@ load_metadata (StatusIcon *icon)
 }
 
 void
-status_icon_set_size (StatusIcon *icon, gint size)
+status_icon_set_size (StatusIcon *icon,
+                      gint        color_size,
+                      gint        symbolic_size)
 {
     g_return_if_fail (STATUS_IS_ICON (icon));
 
-    if (size % 2 != 0)
-    {
-        size--;
-    }
-
-    if (icon->size == size)
-    {
-        return;
-    }
-
-    icon->size = size;
-    xapp_status_icon_interface_set_icon_size (icon->proxy, size);
+    icon->color_icon_size = color_size;
+    icon->symbolic_icon_size = symbolic_size;
 
     update_image (icon);
 }
@@ -588,7 +589,8 @@ status_icon_get_proxy (StatusIcon *icon)
 
 StatusIcon *
 status_icon_new (XAppStatusIconInterface *proxy,
-                 gint                     icon_size)
+                 gint                     color_icon_size,
+                 gint                     symbolic_icon_size)
 {
     StatusIcon *icon = g_object_new (STATUS_TYPE_ICON, NULL);
     icon->proxy = g_object_ref (proxy);
@@ -598,7 +600,7 @@ status_icon_new (XAppStatusIconInterface *proxy,
     load_metadata (icon);
 
     update_orientation (icon);
-    status_icon_set_size (icon, icon_size);
+    status_icon_set_size (icon, color_icon_size, symbolic_icon_size);
 
     return icon;
 }

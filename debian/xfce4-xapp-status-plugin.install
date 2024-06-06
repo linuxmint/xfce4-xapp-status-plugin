@@ -1,3 +1,4 @@
 usr/lib/*/xfce4/panel/plugins
 usr/share/xfce4/panel/plugins
 usr/share/locale
+usr/share/glib-2.0/schemas

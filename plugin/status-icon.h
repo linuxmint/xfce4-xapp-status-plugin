@@ -18,10 +18,12 @@ G_DECLARE_FINAL_TYPE (StatusIcon, status_icon, STATUS, ICON, GtkToggleButton)
 #define VISIBLE_LABEL_MARGIN        5 // When an icon has a label, add a margin between icon and label
 
 StatusIcon              *status_icon_new             (XAppStatusIconInterface      *proxy,
-                                                      gint                          icon_size);
+                                                      gint                          color_icon_size,
+                                                      gint                          symbolic_icon_size);
 
 void                     status_icon_set_size        (StatusIcon                   *icon,
-                                                      gint                          size);
+                                                      gint                          color_icon_size,
+                                                      gint                          symbolic_icon_size);
 void                     status_icon_set_orientation (StatusIcon                   *icon,
                                                       GtkPositionType               orientation);
 XAppStatusIconInterface *status_icon_get_proxy       (StatusIcon *icon);
