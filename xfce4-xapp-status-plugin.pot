@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-14 16:48+0100\n"
+"POT-Creation-Date: 2024-06-15 12:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,14 +17,62 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: plugin/xapp-status-plugin.c:204 plugin/xapp-status-plugin.desktop.in:4
+#: plugin/xapp-status-plugin.c:247 plugin/xapp-status-plugin.desktop.in:4
 msgid "XApp Status Plugin"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:209 plugin/xapp-status-plugin.desktop.in:5
+#: plugin/xapp-status-plugin.c:252 plugin/xapp-status-plugin.desktop.in:5
 msgid "Area where XApp Status icons appear"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:220
+#: plugin/xapp-status-plugin.c:291
+msgid "Use optimal size for panel"
+msgstr ""
+
+#: plugin/xapp-status-plugin.c:292 plugin/xapp-status-plugin.c:301
+msgid "16px"
+msgstr ""
+
+#: plugin/xapp-status-plugin.c:293
+msgid "22px"
+msgstr ""
+
+#: plugin/xapp-status-plugin.c:294 plugin/xapp-status-plugin.c:304
+msgid "24px"
+msgstr ""
+
+#: plugin/xapp-status-plugin.c:295 plugin/xapp-status-plugin.c:305
+msgid "32px"
+msgstr ""
+
+#: plugin/xapp-status-plugin.c:296 plugin/xapp-status-plugin.c:306
+msgid "48px"
+msgstr ""
+
+#: plugin/xapp-status-plugin.c:300
+msgid "10px"
+msgstr ""
+
+#: plugin/xapp-status-plugin.c:302
+msgid "18px"
+msgstr ""
+
+#: plugin/xapp-status-plugin.c:303
+msgid "20px"
+msgstr ""
+
+#: plugin/xapp-status-plugin.c:362
 msgid "About"
+msgstr ""
+
+#: plugin/xapp-status-plugin.c:373
+msgid "Icon sizes"
+msgstr ""
+
+#: plugin/xapp-status-plugin.c:382
+msgid "Color"
+msgstr ""
+
+#: plugin/xapp-status-plugin.c:416
+msgid "Symbolic"
 msgstr ""
