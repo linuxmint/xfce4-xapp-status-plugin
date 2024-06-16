@@ -1,3 +1,15 @@
+xfce4-xapp-status-plugin (0.3.4) wilma; urgency=medium
+
+  [ Michael Webster ]
+  * Support markup for the icon's tooltip.
+  * Allow icon sizes to be configured in the context menu.
+  * Don't force an icon's allocation to match the panel height.
+
+  [ Clement Lefebvre ]
+  * l10n: Update POT
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun, 16 Jun 2024 11:05:30 +0100
+
 xfce4-xapp-status-plugin (0.3.3) virginia; urgency=medium
 
   * l10n: Update translations
