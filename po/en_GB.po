@@ -7,24 +7,72 @@ msgid ""
 msgstr ""
 "Project-Id-Version: linuxmint\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2019-10-14 16:48+0100\n"
-"PO-Revision-Date: 2019-10-15 14:31+0000\n"
+"POT-Creation-Date: 2024-06-15 12:23+0100\n"
+"PO-Revision-Date: 2024-06-18 13:04+0000\n"
 "Last-Translator: Andi Chandler <Unknown>\n"
 "Language-Team: English (United Kingdom) <en_GB@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2024-01-04 14:59+0000\n"
-"X-Generator: Launchpad (build e1eeab5b20e19239bd7d5f36676f7a52988db88b)\n"
+"X-Launchpad-Export-Date: 2024-06-18 17:57+0000\n"
+"X-Generator: Launchpad (build bbfa2351d9d6a9ddfe262109428f7bf5516e65d1)\n"
 
-#: plugin/xapp-status-plugin.c:204 plugin/xapp-status-plugin.desktop.in:4
+#: plugin/xapp-status-plugin.c:247 plugin/xapp-status-plugin.desktop.in:4
 msgid "XApp Status Plugin"
 msgstr "XApp Status Plugin"
 
-#: plugin/xapp-status-plugin.c:209 plugin/xapp-status-plugin.desktop.in:5
+#: plugin/xapp-status-plugin.c:252 plugin/xapp-status-plugin.desktop.in:5
 msgid "Area where XApp Status icons appear"
 msgstr "Area where XApp Status icons appear"
 
-#: plugin/xapp-status-plugin.c:220
+#: plugin/xapp-status-plugin.c:291
+msgid "Use optimal size for panel"
+msgstr "Use optimal size for panel"
+
+#: plugin/xapp-status-plugin.c:292 plugin/xapp-status-plugin.c:301
+msgid "16px"
+msgstr "16px"
+
+#: plugin/xapp-status-plugin.c:293
+msgid "22px"
+msgstr "22px"
+
+#: plugin/xapp-status-plugin.c:294 plugin/xapp-status-plugin.c:304
+msgid "24px"
+msgstr "24px"
+
+#: plugin/xapp-status-plugin.c:295 plugin/xapp-status-plugin.c:305
+msgid "32px"
+msgstr "32px"
+
+#: plugin/xapp-status-plugin.c:296 plugin/xapp-status-plugin.c:306
+msgid "48px"
+msgstr "48px"
+
+#: plugin/xapp-status-plugin.c:300
+msgid "10px"
+msgstr "10px"
+
+#: plugin/xapp-status-plugin.c:302
+msgid "18px"
+msgstr "18px"
+
+#: plugin/xapp-status-plugin.c:303
+msgid "20px"
+msgstr "20px"
+
+#: plugin/xapp-status-plugin.c:362
 msgid "About"
 msgstr "About"
+
+#: plugin/xapp-status-plugin.c:373
+msgid "Icon sizes"
+msgstr "Icon sizes"
+
+#: plugin/xapp-status-plugin.c:382
+msgid "Color"
+msgstr "Colour"
+
+#: plugin/xapp-status-plugin.c:416
+msgid "Symbolic"
+msgstr "Symbolic"
