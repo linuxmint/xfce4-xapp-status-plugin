@@ -1,16 +1,16 @@
-# Bulgarian translation for linuxmint
-# Copyright (c) 2019 Rosetta Contributors and Canonical Ltd 2019
+# Breton translation for linuxmint
+# Copyright (c) 2024 Rosetta Contributors and Canonical Ltd 2024
 # This file is distributed under the same license as the linuxmint package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxmint\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2024-06-15 12:23+0100\n"
-"PO-Revision-Date: 2019-10-15 13:59+0000\n"
-"Last-Translator: spacy01 <Unknown>\n"
-"Language-Team: Bulgarian <bg@li.org>\n"
+"PO-Revision-Date: 2024-07-04 08:12+0000\n"
+"Last-Translator: Anthony Guechoum <a.guechoum@gmail.com>\n"
+"Language-Team: Breton <br@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,60 +19,60 @@ msgstr ""
 
 #: plugin/xapp-status-plugin.c:247 plugin/xapp-status-plugin.desktop.in:4
 msgid "XApp Status Plugin"
-msgstr "Плъгин а състоянието на XApp"
+msgstr "Enlugellad XApp Status"
 
 #: plugin/xapp-status-plugin.c:252 plugin/xapp-status-plugin.desktop.in:5
 msgid "Area where XApp Status icons appear"
-msgstr "Място, където се покзва иконката на XApp"
+msgstr "Lec'h ma vez diskouezet arlunioù XApp Status"
 
 #: plugin/xapp-status-plugin.c:291
 msgid "Use optimal size for panel"
-msgstr ""
+msgstr "Implijout ar vent wellek evit ar benel"
 
 #: plugin/xapp-status-plugin.c:292 plugin/xapp-status-plugin.c:301
 msgid "16px"
-msgstr ""
+msgstr "16px"
 
 #: plugin/xapp-status-plugin.c:293
 msgid "22px"
-msgstr ""
+msgstr "22px"
 
 #: plugin/xapp-status-plugin.c:294 plugin/xapp-status-plugin.c:304
 msgid "24px"
-msgstr ""
+msgstr "24px"
 
 #: plugin/xapp-status-plugin.c:295 plugin/xapp-status-plugin.c:305
 msgid "32px"
-msgstr ""
+msgstr "32px"
 
 #: plugin/xapp-status-plugin.c:296 plugin/xapp-status-plugin.c:306
 msgid "48px"
-msgstr ""
+msgstr "48px"
 
 #: plugin/xapp-status-plugin.c:300
 msgid "10px"
-msgstr ""
+msgstr "10px"
 
 #: plugin/xapp-status-plugin.c:302
 msgid "18px"
-msgstr ""
+msgstr "18px"
 
 #: plugin/xapp-status-plugin.c:303
 msgid "20px"
-msgstr ""
+msgstr "20px"
 
 #: plugin/xapp-status-plugin.c:362
 msgid "About"
-msgstr "Относно"
+msgstr "Diwar-benn"
 
 #: plugin/xapp-status-plugin.c:373
 msgid "Icon sizes"
-msgstr ""
+msgstr "Ment an arlunioù"
 
 #: plugin/xapp-status-plugin.c:382
 msgid "Color"
-msgstr ""
+msgstr "Liv"
 
 #: plugin/xapp-status-plugin.c:416
 msgid "Symbolic"
-msgstr ""
+msgstr "Arouezek"
