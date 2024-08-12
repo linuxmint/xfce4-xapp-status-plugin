@@ -68,7 +68,7 @@ xapp_status_plugin_init (XAppStatusPlugin *plugin)
 {
   plugin->monitor = NULL;
   plugin->lookup_table = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                                g_free, g_object_unref);
+                                                g_free, NULL);
 }
 
 static gchar *
@@ -345,12 +345,9 @@ xapp_status_plugin_free_data (XfcePanelPlugin *panel_plugin)
 {
   XAppStatusPlugin *plugin = XAPP_STATUS_PLUGIN (panel_plugin);
 
+  g_clear_object (&plugin->monitor);
   g_hash_table_destroy (plugin->lookup_table);
-
-  if (G_LIKELY (plugin->monitor != NULL))
-    {
-      g_clear_object (&plugin->monitor);
-    }
+  g_clear_object (&plugin->settings);
 }
 
 static void

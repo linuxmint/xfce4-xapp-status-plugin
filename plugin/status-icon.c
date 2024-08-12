@@ -466,18 +466,11 @@ status_icon_dispose (GObject *object)
 }
 
 static void
-status_icon_finalize (GObject *object)
-{
-    G_OBJECT_CLASS (status_icon_parent_class)->finalize (object);
-}
-
-static void
 status_icon_class_init (StatusIconClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
     object_class->dispose = status_icon_dispose;
-    object_class->finalize = status_icon_finalize;
 
     signals [RE_SORT] =
     g_signal_new ("re-sort",
