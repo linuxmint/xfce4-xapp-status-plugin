@@ -5,4 +5,6 @@ touch xfce4-xapp-status-plugin.pot
 xgettext --language=C --keyword=_ --keyword=N_ --output=xfce4-xapp-status-plugin.pot plugin/*.c
 xgettext --language=Desktop --join-existing --add-comments \
           -k --keyword=Name --keyword=Comment --output=xfce4-xapp-status-plugin.pot plugin/*.in
+xgettext --language=Glade --join-existing --output=xfce4-xapp-status-plugin.pot plugin/*.glade
+
 
