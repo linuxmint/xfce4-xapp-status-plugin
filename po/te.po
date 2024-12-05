@@ -1,16 +1,16 @@
-# Spanish translation for linuxmint
-# Copyright (c) 2019 Rosetta Contributors and Canonical Ltd 2019
+# Telugu translation for linuxmint
+# Copyright (c) 2024 Rosetta Contributors and Canonical Ltd 2024
 # This file is distributed under the same license as the linuxmint package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxmint\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2024-06-15 12:23+0100\n"
-"PO-Revision-Date: 2024-06-15 15:57+0000\n"
-"Last-Translator: Isidro Pisa <isidro@pisa.red>\n"
-"Language-Team: Spanish <es@li.org>\n"
+"PO-Revision-Date: 2024-09-14 13:19+0000\n"
+"Last-Translator: Aryan Karamtoth <Unknown>\n"
+"Language-Team: Telugu <te@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,19 +19,19 @@ msgstr ""
 
 #: plugin/xapp-status-plugin.c:247 plugin/xapp-status-plugin.desktop.in:4
 msgid "XApp Status Plugin"
-msgstr "Iconos de estado de XApp"
+msgstr "XApp స్టాటస్ ప్లగ్గిన్"
 
 #: plugin/xapp-status-plugin.c:252 plugin/xapp-status-plugin.desktop.in:5
 msgid "Area where XApp Status icons appear"
-msgstr "Área donde aparecen los iconos de estado de XApp"
+msgstr "XApp స్టాటస్ ఐకానులు కనిపించే చోటు"
 
 #: plugin/xapp-status-plugin.c:291
 msgid "Use optimal size for panel"
-msgstr "Usar el tamaño óptimo para el panel"
+msgstr "ప్యానెల్ కోసం సరైన పరిమాణాన్ని ఉపయోగించండి"
 
 #: plugin/xapp-status-plugin.c:292 plugin/xapp-status-plugin.c:301
 msgid "16px"
-msgstr "16 px"
+msgstr "16px"
 
 #: plugin/xapp-status-plugin.c:293
 msgid "22px"
@@ -43,7 +43,7 @@ msgstr "24px"
 
 #: plugin/xapp-status-plugin.c:295 plugin/xapp-status-plugin.c:305
 msgid "32px"
-msgstr "32 px"
+msgstr "32px"
 
 #: plugin/xapp-status-plugin.c:296 plugin/xapp-status-plugin.c:306
 msgid "48px"
@@ -63,16 +63,16 @@ msgstr "20px"
 
 #: plugin/xapp-status-plugin.c:362
 msgid "About"
-msgstr "Acerca de"
+msgstr "గురించి"
 
 #: plugin/xapp-status-plugin.c:373
 msgid "Icon sizes"
-msgstr "Tamaño de los iconos"
+msgstr "చిహ్నం పరిమాణాలు"
 
 #: plugin/xapp-status-plugin.c:382
 msgid "Color"
-msgstr "Color"
+msgstr "రంగు"
 
 #: plugin/xapp-status-plugin.c:416
 msgid "Symbolic"
-msgstr "Simbólico"
+msgstr "సింబాలిక్"

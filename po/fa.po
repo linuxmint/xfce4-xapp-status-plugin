@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: linuxmint\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2024-06-15 12:23+0100\n"
-"PO-Revision-Date: 2023-08-05 05:58+0000\n"
-"Last-Translator: Mr.Ravi <Unknown>\n"
+"PO-Revision-Date: 2024-10-28 19:29+0000\n"
+"Last-Translator: Barbod Emadoddin <barbod9292@gmail.com>\n"
 "Language-Team: Persian <fa@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2024-07-21 09:03+0000\n"
-"X-Generator: Launchpad (build bbfa2351d9d6a9ddfe262109428f7bf5516e65d1)\n"
+"X-Launchpad-Export-Date: 2024-12-05 10:19+0000\n"
+"X-Generator: Launchpad (build 1519c6efe8e9bd78e6c5ebf2eb5bcb040b95ad32)\n"
 
 #: plugin/xapp-status-plugin.c:247 plugin/xapp-status-plugin.desktop.in:4
 msgid "XApp Status Plugin"
@@ -27,39 +27,39 @@ msgstr "ناحیه‌ای که نمادهای وضعیت XApp آنجا نمای�
 
 #: plugin/xapp-status-plugin.c:291
 msgid "Use optimal size for panel"
-msgstr ""
+msgstr "استفاده از سایز مناسب برای پنل"
 
 #: plugin/xapp-status-plugin.c:292 plugin/xapp-status-plugin.c:301
 msgid "16px"
-msgstr ""
+msgstr "۱۶ پیکسل"
 
 #: plugin/xapp-status-plugin.c:293
 msgid "22px"
-msgstr ""
+msgstr "۲۲ پیکسل"
 
 #: plugin/xapp-status-plugin.c:294 plugin/xapp-status-plugin.c:304
 msgid "24px"
-msgstr ""
+msgstr "۲۴ پیکسل"
 
 #: plugin/xapp-status-plugin.c:295 plugin/xapp-status-plugin.c:305
 msgid "32px"
-msgstr ""
+msgstr "۳۲ پیکسل"
 
 #: plugin/xapp-status-plugin.c:296 plugin/xapp-status-plugin.c:306
 msgid "48px"
-msgstr ""
+msgstr "۴۸ پیکسل"
 
 #: plugin/xapp-status-plugin.c:300
 msgid "10px"
-msgstr ""
+msgstr "۱۰ پیکسل"
 
 #: plugin/xapp-status-plugin.c:302
 msgid "18px"
-msgstr ""
+msgstr "۱۸ پیکسل"
 
 #: plugin/xapp-status-plugin.c:303
 msgid "20px"
-msgstr ""
+msgstr "۲۰ پیکسل"
 
 #: plugin/xapp-status-plugin.c:362
 msgid "About"
@@ -67,12 +67,12 @@ msgstr "درباره"
 
 #: plugin/xapp-status-plugin.c:373
 msgid "Icon sizes"
-msgstr ""
+msgstr "اندازه آیکون ها"
 
 #: plugin/xapp-status-plugin.c:382
 msgid "Color"
-msgstr ""
+msgstr "رنگ"
 
 #: plugin/xapp-status-plugin.c:416
 msgid "Symbolic"
-msgstr ""
+msgstr "نمادین"
