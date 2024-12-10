@@ -414,9 +414,7 @@ xapp_status_plugin_size_changed (XfcePanelPlugin *panel_plugin,
     {
         StatusIcon *icon = STATUS_ICON (value);
 
-        gtk_widget_set_size_request (GTK_WIDGET (icon),
-                                     orientation == GTK_ORIENTATION_HORIZONTAL ? -1 : max_size,
-                                     orientation == GTK_ORIENTATION_VERTICAL   ? -1 : max_size);
+        gtk_widget_set_size_request (GTK_WIDGET (icon), max_size, max_size);
 
         status_icon_set_size (icon,
                               get_color_icon_size (applet),
@@ -471,7 +469,6 @@ initialize_combo (XAppStatusPlugin *plugin,
     gint size = g_settings_get_int (plugin->settings, key);
 
     id = g_strdup_printf ("%d", size);
-    g_printerr ("id: %s\n", id);
     gtk_combo_box_set_active_id (GTK_COMBO_BOX (combo), id);
 }
 

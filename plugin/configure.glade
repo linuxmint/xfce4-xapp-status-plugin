@@ -75,6 +75,11 @@
         <col id="2">20</col>
       </row>
       <row>
+        <col id="0" translatable="yes">22px</col>
+        <col id="1">22</col>
+        <col id="2">22</col>
+      </row>
+      <row>
         <col id="0" translatable="yes">24px</col>
         <col id="1">24</col>
         <col id="2">24</col>
