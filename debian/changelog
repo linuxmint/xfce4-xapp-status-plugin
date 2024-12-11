@@ -1,3 +1,11 @@
+xfce4-xapp-status-plugin (0.3.9) xia; urgency=medium
+
+  [ Michael Webster ]
+  * debian: Install the glade file.
+  * Make icon spacing consistent with other panel items, improve default symbolic icon size.
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 11 Dec 2024 12:33:10 +0000
+
 xfce4-xapp-status-plugin (0.3.8) xia; urgency=medium
 
   * l10n: Update translations
