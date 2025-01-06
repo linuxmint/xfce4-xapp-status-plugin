@@ -1,3 +1,9 @@
+xfce4-xapp-status-plugin (0.4.0) xia; urgency=medium
+
+  * l10n: Update translations
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 06 Jan 2025 14:19:04 +0000
+
 xfce4-xapp-status-plugin (0.3.9) xia; urgency=medium
 
   [ Michael Webster ]
