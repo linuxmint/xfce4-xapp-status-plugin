@@ -2,7 +2,7 @@
 <schemalist>
     <schema id="org.x.apps.xfce4-status-plugin" path="/org/x/apps/xfce4-status-plugin/" gettext-domain="xapps">
     <key name="symbolic-icon-size" type="i">
-      <default>22</default>
+      <default>20</default>
       <summary>Symbolic icon size</summary>
     </key>
     <key name="color-icon-size" type="i">
