@@ -8,26 +8,26 @@ msgstr ""
 "Project-Id-Version: linuxmint\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2024-06-15 12:23+0100\n"
-"PO-Revision-Date: 2024-09-10 14:54+0000\n"
-"Last-Translator: Divya kalra <Unknown>\n"
+"PO-Revision-Date: 2025-03-18 13:00+0000\n"
+"Last-Translator: Panwar <Unknown>\n"
 "Language-Team: Hindi <hi@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2025-01-06 12:01+0000\n"
-"X-Generator: Launchpad (build 6394e03793719e8d73f5a60b5439440e693c92f1)\n"
+"X-Launchpad-Export-Date: 2025-07-31 09:24+0000\n"
+"X-Generator: Launchpad (build 647c49fc7f614412c17a151d8ba4fadd90c06a00)\n"
 
 #: plugin/xapp-status-plugin.c:247 plugin/xapp-status-plugin.desktop.in:4
 msgid "XApp Status Plugin"
-msgstr "XApp स्थिति प्लगइन"
+msgstr "XApp स्थिति प्लगिन"
 
 #: plugin/xapp-status-plugin.c:252 plugin/xapp-status-plugin.desktop.in:5
 msgid "Area where XApp Status icons appear"
-msgstr "वह क्षेत्र जहां XApp स्थिति आइकन दिखाई देते हैं"
+msgstr "क्षेत्र जहाँ XApp स्थिति आइकन प्रदर्शित होंगे"
 
 #: plugin/xapp-status-plugin.c:291
 msgid "Use optimal size for panel"
-msgstr "पैनल के लिए इष्टतम आकार का उपयोग करें"
+msgstr "पैनल हेतु इष्टतम आकार का उपयोग करें"
 
 #: plugin/xapp-status-plugin.c:292 plugin/xapp-status-plugin.c:301
 msgid "16px"
@@ -63,7 +63,7 @@ msgstr "20पिक्सल"
 
 #: plugin/xapp-status-plugin.c:362
 msgid "About"
-msgstr "परिचय"
+msgstr "बारे में"
 
 #: plugin/xapp-status-plugin.c:373
 msgid "Icon sizes"

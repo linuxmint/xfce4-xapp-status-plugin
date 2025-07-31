@@ -1,16 +1,16 @@
-# Azerbaijani translation for linuxmint
-# Copyright (c) 2023 Rosetta Contributors and Canonical Ltd 2023
+# Malayalam translation for linuxmint
+# Copyright (c) 2025 Rosetta Contributors and Canonical Ltd 2025
 # This file is distributed under the same license as the linuxmint package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: linuxmint\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2024-06-15 12:23+0100\n"
-"PO-Revision-Date: 2023-07-12 07:10+0000\n"
-"Last-Translator: Oktay Imanzade <Unknown>\n"
-"Language-Team: Azerbaijani <az@li.org>\n"
+"PO-Revision-Date: 2025-07-17 06:36+0000\n"
+"Last-Translator: MOHAMMED RASHITH KP <Unknown>\n"
+"Language-Team: Malayalam <ml@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,60 +19,60 @@ msgstr ""
 
 #: plugin/xapp-status-plugin.c:247 plugin/xapp-status-plugin.desktop.in:4
 msgid "XApp Status Plugin"
-msgstr ""
+msgstr "XApp സ്റ്റാറ്റസ് പ്ലഗിൻ"
 
 #: plugin/xapp-status-plugin.c:252 plugin/xapp-status-plugin.desktop.in:5
 msgid "Area where XApp Status icons appear"
-msgstr "XApp Status şəkilciklərinin göründüyü sahə"
+msgstr "XApp സ്റ്റാറ്റസ് ഐക്കണുകൾ ദൃശ്യമാകുന്ന സ്ഥലം"
 
 #: plugin/xapp-status-plugin.c:291
 msgid "Use optimal size for panel"
-msgstr ""
+msgstr "പാനലിന് ഒപ്റ്റിമൽ വലുപ്പം ഉപയോഗിക്കുക"
 
 #: plugin/xapp-status-plugin.c:292 plugin/xapp-status-plugin.c:301
 msgid "16px"
-msgstr ""
+msgstr "16px"
 
 #: plugin/xapp-status-plugin.c:293
 msgid "22px"
-msgstr ""
+msgstr "22px"
 
 #: plugin/xapp-status-plugin.c:294 plugin/xapp-status-plugin.c:304
 msgid "24px"
-msgstr ""
+msgstr "24px"
 
 #: plugin/xapp-status-plugin.c:295 plugin/xapp-status-plugin.c:305
 msgid "32px"
-msgstr ""
+msgstr "32px"
 
 #: plugin/xapp-status-plugin.c:296 plugin/xapp-status-plugin.c:306
 msgid "48px"
-msgstr ""
+msgstr "48px"
 
 #: plugin/xapp-status-plugin.c:300
 msgid "10px"
-msgstr ""
+msgstr "10px"
 
 #: plugin/xapp-status-plugin.c:302
 msgid "18px"
-msgstr ""
+msgstr "18px"
 
 #: plugin/xapp-status-plugin.c:303
 msgid "20px"
-msgstr ""
+msgstr "20px"
 
 #: plugin/xapp-status-plugin.c:362
 msgid "About"
-msgstr "Haqqında"
+msgstr "അതേക്കുറിച്ച് (About)"
 
 #: plugin/xapp-status-plugin.c:373
 msgid "Icon sizes"
-msgstr ""
+msgstr "ഐക്കൺ വലുപ്പങ്ങൾ"
 
 #: plugin/xapp-status-plugin.c:382
 msgid "Color"
-msgstr ""
+msgstr "നിറം"
 
 #: plugin/xapp-status-plugin.c:416
 msgid "Symbolic"
-msgstr ""
+msgstr "പ്രതീകാത്മകം(Symbolic)"
