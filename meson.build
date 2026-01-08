@@ -1,4 +1,4 @@
-project('xfce4-xapp-status-plugin', 'c', version : '0.4.3')
+project('xfce4-xapp-status-plugin', 'c', version : '0.4.4')
 
 gnome = import('gnome')
 pkg = import('pkgconfig')
