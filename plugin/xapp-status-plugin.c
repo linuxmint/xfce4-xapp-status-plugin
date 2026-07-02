@@ -87,13 +87,19 @@ xapp_status_plugin_init (XAppStatusPlugin *plugin)
                                                 g_free, NULL);
 }
 
+static const gchar *
+non_null_string (const gchar *value)
+{
+    return value != NULL ? value : "";
+}
+
 static gchar *
 get_unique_key (GDBusProxy *proxy)
 {
     const gchar *name = xapp_status_icon_interface_get_name (XAPP_STATUS_ICON_INTERFACE (proxy));
     const gchar *path = g_dbus_proxy_get_object_path (G_DBUS_PROXY (proxy));
 
-    return g_strconcat (name, path, NULL);
+    return g_strconcat (non_null_string (name), non_null_string (path), NULL);
 }
 
 static gint
@@ -101,14 +107,18 @@ compare_icons (gpointer a,
                gpointer b)
 {
     XAppStatusIconInterface *proxy_a, *proxy_b;
+    const gchar *icon_name_a, *icon_name_b, *name_a, *name_b;
     gboolean sym_a, sym_b;
     gint res;
 
     proxy_a = status_icon_get_proxy (STATUS_ICON (a));
     proxy_b = status_icon_get_proxy (STATUS_ICON (b));
 
-    sym_a = g_strstr_len (xapp_status_icon_interface_get_icon_name (proxy_a), -1, "symbolic") != NULL;
-    sym_b = g_strstr_len (xapp_status_icon_interface_get_icon_name (proxy_b), -1, "symbolic") != NULL;
+    icon_name_a = xapp_status_icon_interface_get_icon_name (proxy_a);
+    icon_name_b = xapp_status_icon_interface_get_icon_name (proxy_b);
+
+    sym_a = icon_name_a != NULL && g_strstr_len (icon_name_a, -1, "symbolic") != NULL;
+    sym_b = icon_name_b != NULL && g_strstr_len (icon_name_b, -1, "symbolic") != NULL;
 
     if (sym_a && !sym_b)
     {
@@ -120,8 +130,11 @@ compare_icons (gpointer a,
         return -1;
     }
 
-    res = g_utf8_collate (xapp_status_icon_interface_get_name (proxy_a),
-                          xapp_status_icon_interface_get_name (proxy_b));
+    name_a = xapp_status_icon_interface_get_name (proxy_a);
+    name_b = xapp_status_icon_interface_get_name (proxy_b);
+
+    res = g_utf8_collate (non_null_string (name_a),
+                          non_null_string (name_b));
 
     if (res != 0)
     {
@@ -284,7 +297,6 @@ xapp_status_plugin_layout_icons (XAppStatusPlugin *plugin)
     for (iter = icons; iter != NULL; iter = iter->next)
     {
         StatusIcon *icon = STATUS_ICON (iter->data);
-        XAppStatusIconInterface *proxy = status_icon_get_proxy (icon);
         gint column, row;
 
         if (!status_icon_should_reserve_slot (icon))
@@ -295,10 +307,7 @@ xapp_status_plugin_layout_icons (XAppStatusPlugin *plugin)
             continue;
         }
 
-        if (xapp_status_icon_interface_get_visible (proxy))
-        {
-            gtk_widget_show (GTK_WIDGET (icon));
-        }
+        gtk_widget_show (GTK_WIDGET (icon));
 
         if (panel_orientation == GTK_ORIENTATION_VERTICAL)
         {
@@ -372,6 +381,7 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
     g_free (key);
 
     g_signal_connect_swapped (icon, "re-sort", G_CALLBACK (sort_icons), plugin);
+    g_signal_connect_object (proxy, "notify::icon-name", G_CALLBACK (sort_icons), plugin, G_CONNECT_SWAPPED);
     g_signal_connect_object (proxy, "notify::visible", G_CALLBACK (sort_icons), plugin, G_CONNECT_SWAPPED);
     sort_icons (plugin);
 
