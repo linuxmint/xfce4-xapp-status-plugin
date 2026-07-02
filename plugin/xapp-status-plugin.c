@@ -49,6 +49,8 @@ struct _XAppStatusPlugin
   /* A GtkListBox to hold our icons */
   GtkWidget *icon_box;
 
+  guint nrows;
+
   GSettings *settings;
 };
 
@@ -59,6 +61,10 @@ static gboolean xapp_status_plugin_size_changed (XfcePanelPlugin *panel_plugin,
                                                         gint             size);
 static void     xapp_status_plugin_screen_position_changed (XfcePanelPlugin   *panel_plugin,
                                                                    XfceScreenPosition position);
+static void     xapp_status_plugin_nrows_changed (XfcePanelPlugin *panel_plugin,
+                                                  guint            rows);
+static gint     get_panel_nrows    (XAppStatusPlugin *plugin);
+static gint     get_panel_row_size (XAppStatusPlugin *plugin);
 static gint     get_color_icon_size (XAppStatusPlugin *plugin);
 static gint     get_symbolic_icon_size (XAppStatusPlugin *plugin);
 
@@ -67,6 +73,7 @@ static void
 xapp_status_plugin_init (XAppStatusPlugin *plugin)
 {
   plugin->monitor = NULL;
+  plugin->nrows = 1;
   plugin->lookup_table = g_hash_table_new_full (g_str_hash, g_str_equal,
                                                 g_free, NULL);
 }
@@ -255,28 +262,45 @@ xapp_status_plugin_about (XfcePanelPlugin *plugin)
 }
 
 static gint
+get_panel_nrows (XAppStatusPlugin *plugin)
+{
+    if (plugin->nrows == 0)
+    {
+        plugin->nrows = MAX (xfce_panel_plugin_get_nrows (XFCE_PANEL_PLUGIN (plugin)), 1u);
+    }
+
+    return (gint) plugin->nrows;
+}
+
+static gint
+get_panel_row_size (XAppStatusPlugin *plugin)
+{
+    return MAX (xfce_panel_plugin_get_size (XFCE_PANEL_PLUGIN (plugin)) / get_panel_nrows (plugin), 1);
+}
+
+static gint
 get_color_icon_size (XAppStatusPlugin *plugin)
 {
-    gint size, panel_height;
+    gint size, row_size;
 
     size = g_settings_get_int (plugin->settings, KEY_COLOR_ICON_SIZE);
-    panel_height = xfce_panel_plugin_get_size (XFCE_PANEL_PLUGIN (plugin));
+    row_size = get_panel_row_size (plugin);
 
-    if (size > 0 && size < panel_height)
+    if (size > 0 && size < row_size)
     {
         return size;
     }
 
-    if (panel_height < 22)
+    if (row_size < 22)
         return 16;
     else
-    if (panel_height < 24)
+    if (row_size < 24)
         return 22;
     else
-    if (panel_height < 32)
+    if (row_size < 32)
         return 24;
     else
-    if (panel_height < 48)
+    if (row_size < 48)
         return 32;
 
     return 48;
@@ -285,23 +309,26 @@ get_color_icon_size (XAppStatusPlugin *plugin)
 static gint
 get_symbolic_icon_size (XAppStatusPlugin *plugin)
 {
-    gint size, panel_height;
+    gint size, row_size;
 
     size = g_settings_get_int (plugin->settings, KEY_SYMBOLIC_ICON_SIZE);
-    panel_height = xfce_panel_plugin_get_size (XFCE_PANEL_PLUGIN (plugin));
+    row_size = get_panel_row_size (plugin);
 
-    if (size > 0 && size < panel_height)
+    if (size > 0 && size < row_size)
     {
         return size;
     }
 
-    return panel_height - 4;
+    return MAX (row_size - 4, 1);
 }
 
 static void
 xapp_status_plugin_construct (XfcePanelPlugin *panel_plugin)
 {
     XAppStatusPlugin *plugin = XAPP_STATUS_PLUGIN (panel_plugin);
+
+    plugin->settings = g_settings_new (SETTINGS_SCHEMA);
+    plugin->nrows = MAX (xfce_panel_plugin_get_nrows (panel_plugin), 1u);
 
     plugin->monitor = xapp_status_icon_monitor_new ();
 
@@ -331,9 +358,7 @@ xapp_status_plugin_construct (XfcePanelPlugin *panel_plugin)
     xfce_panel_plugin_set_small (panel_plugin, TRUE);
 
     xapp_status_plugin_screen_position_changed (panel_plugin,
-                                                       xfce_panel_plugin_get_orientation (panel_plugin));
-
-    plugin->settings = g_settings_new (SETTINGS_SCHEMA);
+                                                xfce_panel_plugin_get_screen_position (panel_plugin));
 
     xfce_panel_plugin_menu_show_configure (panel_plugin);
     xfce_panel_plugin_menu_show_about (panel_plugin);
@@ -403,10 +428,10 @@ xapp_status_plugin_size_changed (XfcePanelPlugin *panel_plugin,
 
     GHashTableIter iter;
     gpointer key, value;
-    GtkOrientation orientation = xfce_panel_plugin_get_orientation (panel_plugin);
     gint max_size;
 
-    max_size = size / xfce_panel_plugin_get_nrows (panel_plugin);
+    (void) size;
+    max_size = get_panel_row_size (applet);
 
     g_hash_table_iter_init (&iter, applet->lookup_table);
 
@@ -424,6 +449,17 @@ xapp_status_plugin_size_changed (XfcePanelPlugin *panel_plugin,
     gtk_widget_queue_resize (GTK_WIDGET (panel_plugin));
 
     return TRUE;
+}
+
+static void
+xapp_status_plugin_nrows_changed (XfcePanelPlugin *panel_plugin,
+                                  guint            rows)
+{
+    XAppStatusPlugin *plugin = XAPP_STATUS_PLUGIN (panel_plugin);
+
+    plugin->nrows = MAX (rows, 1u);
+    xapp_status_plugin_size_changed (panel_plugin,
+                                     xfce_panel_plugin_get_size (panel_plugin));
 }
 
 static void
@@ -505,6 +541,7 @@ xapp_status_plugin_class_init (XAppStatusPluginClass *klass)
   plugin_class->free_data = xapp_status_plugin_free_data;
   plugin_class->size_changed = xapp_status_plugin_size_changed;
   plugin_class->screen_position_changed = xapp_status_plugin_screen_position_changed;
+  plugin_class->nrows_changed = xapp_status_plugin_nrows_changed;
   plugin_class->configure_plugin = xapp_status_plugin_configure_plugin;
   plugin_class->about = xapp_status_plugin_about;
 
