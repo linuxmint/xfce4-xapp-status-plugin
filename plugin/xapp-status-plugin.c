@@ -360,6 +360,7 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
     if (icon)
     {
         // Or should we remove the existing one and add this one??
+        g_free (key);
         return;
     }
 
@@ -408,6 +409,7 @@ on_icon_removed (XAppStatusIconMonitor        *monitor,
 
     if (!icon)
     {
+        g_free (key);
         return;
     }
 
