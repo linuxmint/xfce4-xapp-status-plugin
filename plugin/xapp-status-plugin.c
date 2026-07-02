@@ -46,8 +46,10 @@ struct _XAppStatusPlugin
   /* A quick reference to our list box items */
   GHashTable *lookup_table;
 
-  /* A GtkListBox to hold our icons */
+  /* A GtkGrid to hold our icons */
   GtkWidget *icon_box;
+
+  GPtrArray *layout_spacers;
 
   guint nrows;
 
@@ -61,8 +63,14 @@ static gboolean xapp_status_plugin_size_changed (XfcePanelPlugin *panel_plugin,
                                                         gint             size);
 static void     xapp_status_plugin_screen_position_changed (XfcePanelPlugin   *panel_plugin,
                                                                    XfceScreenPosition position);
+static void     xapp_status_plugin_orientation_changed (XfcePanelPlugin *panel_plugin,
+                                                        GtkOrientation   orientation);
+static void     xapp_status_plugin_mode_changed (XfcePanelPlugin     *panel_plugin,
+                                                 XfcePanelPluginMode  mode);
 static void     xapp_status_plugin_nrows_changed (XfcePanelPlugin *panel_plugin,
                                                   guint            rows);
+static void     xapp_status_plugin_layout_icons  (XAppStatusPlugin *plugin);
+static void     xapp_status_plugin_hide_spacers  (XAppStatusPlugin *plugin);
 static gint     get_panel_nrows    (XAppStatusPlugin *plugin);
 static gint     get_panel_row_size (XAppStatusPlugin *plugin);
 static gint     get_color_icon_size (XAppStatusPlugin *plugin);
@@ -74,6 +82,7 @@ xapp_status_plugin_init (XAppStatusPlugin *plugin)
 {
   plugin->monitor = NULL;
   plugin->nrows = 1;
+  plugin->layout_spacers = g_ptr_array_new ();
   plugin->lookup_table = g_hash_table_new_full (g_str_hash, g_str_equal,
                                                 g_free, NULL);
 }
@@ -133,35 +142,196 @@ compare_icons (gpointer a,
 }
 
 static void
-sort_icons (XAppStatusPlugin *plugin)
+move_grid_child (XAppStatusPlugin *plugin,
+                 GtkWidget        *child,
+                 gint              column,
+                 gint              row)
 {
-    GList *unordered_icons, *icons, *iter;
+    gtk_container_child_set (GTK_CONTAINER (plugin->icon_box),
+                             child,
+                             "left-attach", column,
+                             "top-attach", row,
+                             "width", 1,
+                             "height", 1,
+                             NULL);
+}
 
-    unordered_icons = g_hash_table_get_values (plugin->lookup_table);
+static void
+xapp_status_plugin_ensure_spacers (XAppStatusPlugin *plugin,
+                                   gint              n_spacers)
+{
+    while ((gint) plugin->layout_spacers->len < n_spacers)
+    {
+        GtkWidget *spacer;
 
-    if (!unordered_icons)
+        spacer = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+        gtk_widget_set_no_show_all (spacer, TRUE);
+        gtk_widget_set_can_focus (spacer, FALSE);
+        gtk_widget_set_size_request (spacer, 0, 0);
+        gtk_grid_attach (GTK_GRID (plugin->icon_box),
+                         spacer,
+                         0,
+                         g_hash_table_size (plugin->lookup_table) + plugin->layout_spacers->len + 1,
+                         1,
+                         1);
+
+        g_ptr_array_add (plugin->layout_spacers, spacer);
+    }
+}
+
+static void
+xapp_status_plugin_hide_spacers (XAppStatusPlugin *plugin)
+{
+    guint i;
+
+    for (i = 0; i < plugin->layout_spacers->len; i++)
+    {
+        GtkWidget *spacer = g_ptr_array_index (plugin->layout_spacers, i);
+
+        gtk_widget_hide (spacer);
+        gtk_widget_set_size_request (spacer, 0, 0);
+        move_grid_child (plugin, spacer, 0, 0);
+    }
+}
+
+/* GtkGrid only keeps homogeneous tracks for occupied cells. When the first
+ * panel row/column is not full yet, visible empty spacers keep icons at the
+ * panel row size instead of stretching them across the available allocation.
+ */
+static void
+xapp_status_plugin_reserve_empty_slots (XAppStatusPlugin *plugin,
+                                        GtkOrientation    panel_orientation,
+                                        gint              visible_icons,
+                                        gint              nrows,
+                                        gint              icon_size)
+{
+    gint slot, spacer_index;
+
+    if (visible_icons == 0 || visible_icons >= nrows)
     {
         return;
     }
 
-    icons = g_list_copy (unordered_icons);
-    icons = g_list_sort (icons, (GCompareFunc) compare_icons);
-    icons = g_list_reverse (icons);
+    xapp_status_plugin_ensure_spacers (plugin, nrows - visible_icons);
 
-    iter = icons;
-
-    while (iter)
+    spacer_index = 0;
+    for (slot = visible_icons; slot < nrows; slot++, spacer_index++)
     {
-        StatusIcon *icon = STATUS_ICON (iter->data);
+        GtkWidget *spacer = g_ptr_array_index (plugin->layout_spacers, spacer_index);
+        gint column, row;
 
-        gtk_box_reorder_child (GTK_BOX (plugin->icon_box),
-                               GTK_WIDGET (icon),
-                               0);
+        if (panel_orientation == GTK_ORIENTATION_VERTICAL)
+        {
+            column = slot;
+            row = 0;
+        }
+        else
+        {
+            column = 0;
+            row = slot;
+        }
 
-        iter = iter->next;
+        move_grid_child (plugin, spacer, column, row);
+        gtk_widget_set_size_request (spacer, icon_size, icon_size);
+        gtk_widget_show (spacer);
+    }
+}
+
+static gboolean
+status_icon_should_reserve_slot (StatusIcon *icon)
+{
+    XAppStatusIconInterface *proxy;
+
+    proxy = status_icon_get_proxy (icon);
+
+    return xapp_status_icon_interface_get_visible (proxy);
+}
+
+static void
+xapp_status_plugin_layout_icons (XAppStatusPlugin *plugin)
+{
+    XfcePanelPlugin *panel_plugin = XFCE_PANEL_PLUGIN (plugin);
+    GList *icons, *iter;
+    GtkOrientation panel_orientation;
+    gint nrows, n_icons, icon_size, color_icon_size, symbolic_icon_size, index, visible_index;
+
+    icons = g_hash_table_get_values (plugin->lookup_table);
+
+    if (!icons)
+    {
+        xapp_status_plugin_hide_spacers (plugin);
+        gtk_widget_queue_resize (GTK_WIDGET (panel_plugin));
+        return;
     }
 
+    icons = g_list_sort (icons, (GCompareFunc) compare_icons);
+    nrows = get_panel_nrows (plugin);
+    n_icons = g_list_length (icons);
+    icon_size = get_panel_row_size (plugin);
+    color_icon_size = get_color_icon_size (plugin);
+    symbolic_icon_size = get_symbolic_icon_size (plugin);
+    panel_orientation = xfce_panel_plugin_get_orientation (panel_plugin);
+
+    index = 0;
+    for (iter = icons; iter != NULL; iter = iter->next, index++)
+    {
+        move_grid_child (plugin, GTK_WIDGET (iter->data), 0, n_icons + index);
+    }
+
+    xapp_status_plugin_hide_spacers (plugin);
+
+    visible_index = 0;
+    for (iter = icons; iter != NULL; iter = iter->next)
+    {
+        StatusIcon *icon = STATUS_ICON (iter->data);
+        XAppStatusIconInterface *proxy = status_icon_get_proxy (icon);
+        gint column, row;
+
+        if (!status_icon_should_reserve_slot (icon))
+        {
+            gtk_widget_hide (GTK_WIDGET (icon));
+            gtk_widget_set_size_request (GTK_WIDGET (icon), 0, 0);
+            move_grid_child (plugin, GTK_WIDGET (icon), 0, 0);
+            continue;
+        }
+
+        if (xapp_status_icon_interface_get_visible (proxy))
+        {
+            gtk_widget_show (GTK_WIDGET (icon));
+        }
+
+        if (panel_orientation == GTK_ORIENTATION_VERTICAL)
+        {
+            column = visible_index % nrows;
+            row = visible_index / nrows;
+        }
+        else
+        {
+            column = visible_index / nrows;
+            row = visible_index % nrows;
+        }
+
+        move_grid_child (plugin, GTK_WIDGET (icon), column, row);
+
+        gtk_widget_set_size_request (GTK_WIDGET (icon), icon_size, icon_size);
+        status_icon_set_size (icon, color_icon_size, symbolic_icon_size);
+        visible_index++;
+    }
+
+    xapp_status_plugin_reserve_empty_slots (plugin,
+                                            panel_orientation,
+                                            visible_index,
+                                            nrows,
+                                            icon_size);
+
     g_list_free (icons);
+    gtk_widget_queue_resize (GTK_WIDGET (panel_plugin));
+}
+
+static void
+sort_icons (XAppStatusPlugin *plugin)
+{
+    xapp_status_plugin_layout_icons (plugin);
 }
 
 static void
@@ -188,8 +358,12 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
                             get_color_icon_size (plugin),
                             get_symbolic_icon_size (plugin));
 
-    gtk_container_add (GTK_CONTAINER (plugin->icon_box),
-                       GTK_WIDGET (icon));
+    gtk_grid_attach (GTK_GRID (plugin->icon_box),
+                     GTK_WIDGET (icon),
+                     0,
+                     g_hash_table_size (plugin->lookup_table),
+                     1,
+                     1);
 
     g_hash_table_insert (plugin->lookup_table,
                          g_strdup (key),
@@ -198,6 +372,7 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
     g_free (key);
 
     g_signal_connect_swapped (icon, "re-sort", G_CALLBACK (sort_icons), plugin);
+    g_signal_connect_object (proxy, "notify::visible", G_CALLBACK (sort_icons), plugin, G_CONNECT_SWAPPED);
     sort_icons (plugin);
 
     xapp_status_plugin_size_changed (panel_plugin,
@@ -330,6 +505,24 @@ xapp_status_plugin_construct (XfcePanelPlugin *panel_plugin)
     plugin->settings = g_settings_new (SETTINGS_SCHEMA);
     plugin->nrows = MAX (xfce_panel_plugin_get_nrows (panel_plugin), 1u);
 
+    plugin->icon_box = gtk_grid_new ();
+
+    gtk_grid_set_row_homogeneous (GTK_GRID (plugin->icon_box), TRUE);
+    gtk_grid_set_column_homogeneous (GTK_GRID (plugin->icon_box), TRUE);
+    gtk_widget_set_halign (plugin->icon_box, GTK_ALIGN_FILL);
+    gtk_widget_set_valign (plugin->icon_box, GTK_ALIGN_FILL);
+
+    gtk_widget_show (plugin->icon_box);
+    gtk_container_set_border_width (GTK_CONTAINER (plugin->icon_box),
+                                    INDICATOR_BOX_BORDER);
+
+    gtk_container_add (GTK_CONTAINER (plugin),
+                       plugin->icon_box);
+
+    gtk_widget_show_all (GTK_WIDGET (plugin));
+
+    xfce_panel_plugin_set_small (panel_plugin, FALSE);
+
     plugin->monitor = xapp_status_icon_monitor_new ();
 
     g_signal_connect (plugin->monitor,
@@ -342,20 +535,6 @@ xapp_status_plugin_construct (XfcePanelPlugin *panel_plugin)
                       "icon-removed",
                       G_CALLBACK (on_icon_removed),
                       plugin);
-
-    plugin->icon_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL,
-                                    0);
-
-    gtk_widget_show (plugin->icon_box);
-    gtk_container_set_border_width (GTK_CONTAINER (plugin->icon_box),
-                                    INDICATOR_BOX_BORDER);
-
-    gtk_container_add (GTK_CONTAINER (plugin),
-                       plugin->icon_box);
-
-    gtk_widget_show_all (GTK_WIDGET (plugin));
-
-    xfce_panel_plugin_set_small (panel_plugin, TRUE);
 
     xapp_status_plugin_screen_position_changed (panel_plugin,
                                                 xfce_panel_plugin_get_screen_position (panel_plugin));
@@ -371,6 +550,7 @@ xapp_status_plugin_free_data (XfcePanelPlugin *panel_plugin)
   XAppStatusPlugin *plugin = XAPP_STATUS_PLUGIN (panel_plugin);
 
   g_clear_object (&plugin->monitor);
+  g_ptr_array_free (plugin->layout_spacers, TRUE);
   g_hash_table_destroy (plugin->lookup_table);
   g_clear_object (&plugin->settings);
 }
@@ -381,7 +561,6 @@ xapp_status_plugin_screen_position_changed (XfcePanelPlugin   *panel_plugin,
 {
     XAppStatusPlugin *plugin = XAPP_STATUS_PLUGIN (panel_plugin);
     GtkPositionType xapp_orientation = GTK_POS_TOP;
-    GtkOrientation widget_orientation = GTK_ORIENTATION_HORIZONTAL;
     GHashTableIter iter;
     gpointer key, value;
 
@@ -398,13 +577,11 @@ xapp_status_plugin_screen_position_changed (XfcePanelPlugin   *panel_plugin,
     if (xfce_screen_position_is_left (position))
     {
         xapp_orientation = GTK_POS_LEFT;
-        widget_orientation = GTK_ORIENTATION_VERTICAL;
     }
     else
     if (xfce_screen_position_is_right (position))
     {
         xapp_orientation = GTK_POS_RIGHT;
-        widget_orientation = GTK_ORIENTATION_VERTICAL;
     }
 
     g_hash_table_iter_init (&iter, plugin->lookup_table);
@@ -416,39 +593,33 @@ xapp_status_plugin_screen_position_changed (XfcePanelPlugin   *panel_plugin,
         status_icon_set_orientation (icon, xapp_orientation);
     }
 
-    gtk_orientable_set_orientation (GTK_ORIENTABLE (plugin->icon_box),
-                                    widget_orientation);
+    xapp_status_plugin_layout_icons (plugin);
 }
 
 static gboolean
 xapp_status_plugin_size_changed (XfcePanelPlugin *panel_plugin,
                                         gint             size)
 {
-    XAppStatusPlugin *applet = XAPP_STATUS_PLUGIN (panel_plugin);
-
-    GHashTableIter iter;
-    gpointer key, value;
-    gint max_size;
-
     (void) size;
-    max_size = get_panel_row_size (applet);
-
-    g_hash_table_iter_init (&iter, applet->lookup_table);
-
-    while (g_hash_table_iter_next (&iter, &key, &value))
-    {
-        StatusIcon *icon = STATUS_ICON (value);
-
-        gtk_widget_set_size_request (GTK_WIDGET (icon), max_size, max_size);
-
-        status_icon_set_size (icon,
-                              get_color_icon_size (applet),
-                              get_symbolic_icon_size (applet));
-    }
-
-    gtk_widget_queue_resize (GTK_WIDGET (panel_plugin));
+    xapp_status_plugin_layout_icons (XAPP_STATUS_PLUGIN (panel_plugin));
 
     return TRUE;
+}
+
+static void
+xapp_status_plugin_orientation_changed (XfcePanelPlugin *panel_plugin,
+                                        GtkOrientation   orientation)
+{
+    (void) orientation;
+    xapp_status_plugin_layout_icons (XAPP_STATUS_PLUGIN (panel_plugin));
+}
+
+static void
+xapp_status_plugin_mode_changed (XfcePanelPlugin     *panel_plugin,
+                                 XfcePanelPluginMode  mode)
+{
+    (void) mode;
+    xapp_status_plugin_layout_icons (XAPP_STATUS_PLUGIN (panel_plugin));
 }
 
 static void
@@ -541,6 +712,8 @@ xapp_status_plugin_class_init (XAppStatusPluginClass *klass)
   plugin_class->free_data = xapp_status_plugin_free_data;
   plugin_class->size_changed = xapp_status_plugin_size_changed;
   plugin_class->screen_position_changed = xapp_status_plugin_screen_position_changed;
+  plugin_class->orientation_changed = xapp_status_plugin_orientation_changed;
+  plugin_class->mode_changed = xapp_status_plugin_mode_changed;
   plugin_class->nrows_changed = xapp_status_plugin_nrows_changed;
   plugin_class->configure_plugin = xapp_status_plugin_configure_plugin;
   plugin_class->about = xapp_status_plugin_about;
