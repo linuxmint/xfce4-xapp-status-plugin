@@ -20,7 +20,8 @@ struct _StatusIcon
     gint color_icon_size;
     gint symbolic_icon_size;
 
-    GtkPositionType orientation; /* Orientation of the panel */
+    GtkPositionType panel_position; /* Physical panel edge for menu positioning */
+    GtkOrientation content_orientation;
     const gchar *name;
     const gchar *process_name;
 
@@ -37,8 +38,6 @@ struct _StatusIcon
 };
 
 G_DEFINE_TYPE (StatusIcon, status_icon, GTK_TYPE_TOGGLE_BUTTON)
-
-#define VERTICAL_PANEL(o) (o == GTK_POS_LEFT || o == GTK_POS_RIGHT)
 
 typedef struct {
   gchar *path;
@@ -183,7 +182,7 @@ update_image (StatusIcon *icon)
 
     if (g_file_test (icon_name, G_FILE_TEST_EXISTS))
     {
-        if (is_symbolic || VERTICAL_PANEL (icon->orientation))
+        if (is_symbolic || icon->content_orientation == GTK_ORIENTATION_VERTICAL)
         {
             GFile *icon_file = g_file_new_for_path (icon_name);
             gicon = G_ICON (g_file_icon_new (icon_file));
@@ -238,7 +237,7 @@ calculate_proxy_args (StatusIcon *icon,
     gdk_window_get_origin (window, &wx, &wy);
     gtk_widget_get_allocation (GTK_WIDGET (icon), &allocation);
 
-    switch (icon->orientation)
+    switch (icon->panel_position)
     {
         case GTK_POS_TOP:
             final_x = wx + allocation.x;
@@ -267,10 +266,9 @@ calculate_proxy_args (StatusIcon *icon,
 static void
 update_orientation (StatusIcon *icon)
 {
-    switch (icon->orientation)
+    switch (icon->content_orientation)
     {
-        case GTK_POS_TOP:
-        case GTK_POS_BOTTOM:
+        case GTK_ORIENTATION_HORIZONTAL:
             gtk_orientable_set_orientation (GTK_ORIENTABLE (icon->box), GTK_ORIENTATION_HORIZONTAL);
             if (strlen (gtk_label_get_label (GTK_LABEL (icon->label))) > 0)
             {
@@ -278,8 +276,7 @@ update_orientation (StatusIcon *icon)
                 gtk_widget_set_margin_start (icon->label, VISIBLE_LABEL_MARGIN);
             }
             break;
-        case GTK_POS_LEFT:
-        case GTK_POS_RIGHT:
+        case GTK_ORIENTATION_VERTICAL:
             gtk_orientable_set_orientation (GTK_ORIENTABLE (icon->box), GTK_ORIENTATION_VERTICAL);
             gtk_widget_set_visible (icon->label, FALSE);
             gtk_widget_set_margin_start (icon->label, 0);
@@ -333,7 +330,7 @@ on_button_press_event (GtkWidget *widget,
                                                   x, y,
                                                   event->button.button,
                                                   event->button.time,
-                                                  icon->orientation,
+                                                  icon->panel_position,
                                                   NULL,
                                                   NULL,
                                                   NULL);
@@ -358,7 +355,7 @@ on_button_release_event (GtkWidget *widget,
                                                     x, y,
                                                     event->button.button,
                                                     event->button.time,
-                                                    icon->orientation,
+                                                    icon->panel_position,
                                                     NULL,
                                                     NULL,
                                                     NULL);
@@ -424,6 +421,9 @@ status_icon_init (StatusIcon *icon)
 {
     GtkStyleContext *context;
     GtkCssProvider  *provider;
+
+    icon->panel_position = GTK_POS_TOP;
+    icon->content_orientation = GTK_ORIENTATION_HORIZONTAL;
     icon->box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
 
     gtk_widget_add_events (GTK_WIDGET (icon), GDK_SCROLL_MASK);
@@ -558,18 +558,33 @@ status_icon_set_size (StatusIcon *icon,
 }
 
 void
-status_icon_set_orientation (StatusIcon *icon, GtkPositionType orientation)
+status_icon_set_panel_position (StatusIcon     *icon,
+                                GtkPositionType panel_position)
 {
     g_return_if_fail (STATUS_IS_ICON (icon));
 
-    if (icon->orientation == orientation)
+    if (icon->panel_position == panel_position)
     {
         return;
     }
 
-    icon->orientation = orientation;
+    icon->panel_position = panel_position;
+}
 
+void
+status_icon_set_content_orientation (StatusIcon     *icon,
+                                     GtkOrientation  orientation)
+{
+    g_return_if_fail (STATUS_IS_ICON (icon));
+
+    if (icon->content_orientation == orientation)
+    {
+        return;
+    }
+
+    icon->content_orientation = orientation;
     update_orientation (icon);
+    update_image (icon);
 }
 
 XAppStatusIconInterface *

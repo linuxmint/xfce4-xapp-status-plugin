@@ -63,6 +63,7 @@ static gboolean xapp_status_plugin_size_changed (XfcePanelPlugin *panel_plugin,
                                                         gint             size);
 static void     xapp_status_plugin_screen_position_changed (XfcePanelPlugin   *panel_plugin,
                                                                    XfceScreenPosition position);
+static void     xapp_status_plugin_update_status_icon_layout (XAppStatusPlugin *plugin);
 static void     xapp_status_plugin_orientation_changed (XfcePanelPlugin *panel_plugin,
                                                         GtkOrientation   orientation);
 static void     xapp_status_plugin_mode_changed (XfcePanelPlugin     *panel_plugin,
@@ -258,6 +259,57 @@ status_icon_should_reserve_slot (StatusIcon *icon)
     proxy = status_icon_get_proxy (icon);
 
     return xapp_status_icon_interface_get_visible (proxy);
+}
+
+static GtkPositionType
+get_panel_position (XfceScreenPosition position)
+{
+    if (xfce_screen_position_is_bottom (position))
+    {
+        return GTK_POS_BOTTOM;
+    }
+    else
+    if (xfce_screen_position_is_left (position))
+    {
+        return GTK_POS_LEFT;
+    }
+    else
+    if (xfce_screen_position_is_right (position))
+    {
+        return GTK_POS_RIGHT;
+    }
+
+    return GTK_POS_TOP;
+}
+
+static GtkOrientation
+get_content_orientation (XfcePanelPlugin *panel_plugin)
+{
+    return xfce_panel_plugin_get_mode (panel_plugin) == XFCE_PANEL_PLUGIN_MODE_VERTICAL
+           ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL;
+}
+
+static void
+xapp_status_plugin_update_status_icon_layout (XAppStatusPlugin *plugin)
+{
+    XfcePanelPlugin *panel_plugin = XFCE_PANEL_PLUGIN (plugin);
+    GtkPositionType panel_position;
+    GtkOrientation content_orientation;
+    GHashTableIter iter;
+    gpointer key, value;
+
+    panel_position = get_panel_position (xfce_panel_plugin_get_screen_position (panel_plugin));
+    content_orientation = get_content_orientation (panel_plugin);
+
+    g_hash_table_iter_init (&iter, plugin->lookup_table);
+
+    while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+        StatusIcon *icon = STATUS_ICON (value);
+
+        status_icon_set_panel_position (icon, panel_position);
+        status_icon_set_content_orientation (icon, content_orientation);
+    }
 }
 
 static void
@@ -572,39 +624,10 @@ xapp_status_plugin_screen_position_changed (XfcePanelPlugin   *panel_plugin,
                                                    XfceScreenPosition position)
 {
     XAppStatusPlugin *plugin = XAPP_STATUS_PLUGIN (panel_plugin);
-    GtkPositionType xapp_orientation = GTK_POS_TOP;
-    GHashTableIter iter;
-    gpointer key, value;
 
-    if (xfce_screen_position_is_top (position))
-    {
-        xapp_orientation = GTK_POS_TOP;
-    }
-    else
-    if (xfce_screen_position_is_bottom (position))
-    {
-        xapp_orientation = GTK_POS_BOTTOM;
-    }
-    else
-    if (xfce_screen_position_is_left (position))
-    {
-        xapp_orientation = GTK_POS_LEFT;
-    }
-    else
-    if (xfce_screen_position_is_right (position))
-    {
-        xapp_orientation = GTK_POS_RIGHT;
-    }
+    (void) position;
 
-    g_hash_table_iter_init (&iter, plugin->lookup_table);
-
-    while (g_hash_table_iter_next (&iter, &key, &value))
-    {
-        StatusIcon *icon = STATUS_ICON (value);
-
-        status_icon_set_orientation (icon, xapp_orientation);
-    }
-
+    xapp_status_plugin_update_status_icon_layout (plugin);
     xapp_status_plugin_layout_icons (plugin);
 }
 
@@ -631,6 +654,7 @@ xapp_status_plugin_mode_changed (XfcePanelPlugin     *panel_plugin,
                                  XfcePanelPluginMode  mode)
 {
     (void) mode;
+    xapp_status_plugin_update_status_icon_layout (XAPP_STATUS_PLUGIN (panel_plugin));
     xapp_status_plugin_layout_icons (XAPP_STATUS_PLUGIN (panel_plugin));
 }
 
