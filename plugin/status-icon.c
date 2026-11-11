@@ -33,6 +33,7 @@ struct _StatusIcon
 
     gboolean highlight_both_menus;
     gboolean menu_opened;
+    gboolean is_symbolic;
 
     GCancellable *image_load_cancellable;
 };
@@ -77,16 +78,18 @@ on_image_from_file_loaded (GObject      *source,
 
     pixbuf = g_task_propagate_pointer (task, &error);
 
+    if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+    {
+        g_error_free (error);
+        return;
+    }
+
     g_clear_object (&icon->image_load_cancellable);
 
     if (error)
     {
-        if (error->code != G_IO_ERROR_CANCELLED)
-        {
-            g_warning ("Could not load image from file: %s\n", error->message);
-            g_error_free (error);
-        }
-
+        g_warning ("Could not load image from file: %s\n", error->message);
+        g_error_free (error);
         return;
     }
 
@@ -126,8 +129,20 @@ load_image_from_file_thread (GTask        *task,
     {
         g_task_return_error (task, error);
     }
+    else
+    {
+        g_task_return_pointer (task, pixbuf, g_object_unref);
+    }
+}
 
-    g_task_return_pointer (task, pixbuf, NULL);
+static void
+cancel_image_load (StatusIcon *icon)
+{
+    if (icon->image_load_cancellable != NULL)
+    {
+        g_cancellable_cancel (icon->image_load_cancellable);
+        g_clear_object (&icon->image_load_cancellable);
+    }
 }
 
 static void
@@ -169,6 +184,8 @@ update_image (StatusIcon *icon)
     gboolean is_symbolic = FALSE;
     gint icon_size;
 
+    cancel_image_load (icon);
+
     icon_name = xapp_status_icon_interface_get_icon_name (XAPP_STATUS_ICON_INTERFACE (icon->proxy));
     gicon = NULL;
 
@@ -178,6 +195,7 @@ update_image (StatusIcon *icon)
     }
 
     is_symbolic = !!g_strstr_len (icon_name, -1, "-symbolic");
+    icon->is_symbolic = is_symbolic;
     icon_size = is_symbolic ? icon->symbolic_icon_size : icon->color_icon_size;
 
     if (g_file_test (icon_name, G_FILE_TEST_EXISTS))
@@ -217,6 +235,19 @@ update_image (StatusIcon *icon)
     else
     {
         gtk_image_set_from_icon_name (GTK_IMAGE (icon->image), "image-missing", GTK_ICON_SIZE_MENU);
+    }
+}
+
+static void
+on_icon_name_changed (StatusIcon *icon)
+{
+    gboolean was_symbolic = icon->is_symbolic;
+
+    update_image (icon);
+
+    if (icon->is_symbolic != was_symbolic)
+    {
+        g_signal_emit (icon, signals[RE_SORT], 0);
     }
 }
 
@@ -460,7 +491,7 @@ status_icon_dispose (GObject *object)
     StatusIcon *icon = STATUS_ICON (object);
 
     g_clear_object (&icon->proxy);
-    g_clear_object (&icon->image_load_cancellable);
+    cancel_image_load (icon);
 
     G_OBJECT_CLASS (status_icon_parent_class)->dispose (object);
 }
@@ -492,12 +523,13 @@ bind_props_and_signals (StatusIcon *icon)
 
     g_signal_connect (icon->proxy, "notify::primary-menu-is-open", G_CALLBACK (menu_visible_changed), icon);
     g_signal_connect (icon->proxy, "notify::secondary-menu-is-open", G_CALLBACK (menu_visible_changed), icon);
-    g_signal_connect_swapped (icon->proxy, "notify::icon-name", G_CALLBACK (update_image), icon);
+    g_signal_connect_swapped (icon->proxy, "notify::icon-name", G_CALLBACK (on_icon_name_changed), icon);
     g_signal_connect_swapped (icon->proxy, "notify::name", G_CALLBACK (sortable_name_changed), icon);
 
     g_signal_connect (GTK_WIDGET (icon), "button-press-event", G_CALLBACK (on_button_press_event), NULL);
     g_signal_connect (GTK_WIDGET (icon), "button-release-event", G_CALLBACK (on_button_release_event), NULL);
     g_signal_connect (GTK_WIDGET (icon), "scroll-event", G_CALLBACK (on_scroll_event), NULL);
+    g_signal_connect (GTK_WIDGET (icon), "notify::scale-factor", G_CALLBACK (update_image), NULL);
 }
 
 static void
@@ -550,6 +582,11 @@ status_icon_set_size (StatusIcon *icon,
                       gint        symbolic_size)
 {
     g_return_if_fail (STATUS_IS_ICON (icon));
+
+    if (icon->color_icon_size == color_size && icon->symbolic_icon_size == symbolic_size)
+    {
+        return;
+    }
 
     icon->color_icon_size = color_size;
     icon->symbolic_icon_size = symbolic_size;

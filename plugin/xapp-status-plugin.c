@@ -401,7 +401,6 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
                gpointer                      user_data)
 {
     XAppStatusPlugin *plugin = XAPP_STATUS_PLUGIN (user_data);
-    XfcePanelPlugin *panel_plugin = XFCE_PANEL_PLUGIN (plugin);
     StatusIcon *icon;
     gchar *key;
 
@@ -434,15 +433,10 @@ on_icon_added (XAppStatusIconMonitor        *monitor,
     g_free (key);
 
     g_signal_connect_swapped (icon, "re-sort", G_CALLBACK (sort_icons), plugin);
-    g_signal_connect_object (proxy, "notify::icon-name", G_CALLBACK (sort_icons), plugin, G_CONNECT_SWAPPED);
     g_signal_connect_object (proxy, "notify::visible", G_CALLBACK (sort_icons), plugin, G_CONNECT_SWAPPED);
+
+    xapp_status_plugin_update_status_icon_layout (plugin);
     sort_icons (plugin);
-
-    xapp_status_plugin_size_changed (panel_plugin,
-                                     xfce_panel_plugin_get_size (panel_plugin));
-
-    xapp_status_plugin_screen_position_changed (panel_plugin,
-                                                xfce_panel_plugin_get_screen_position (panel_plugin));
 }
 
 static void
@@ -451,7 +445,6 @@ on_icon_removed (XAppStatusIconMonitor        *monitor,
                  gpointer                      user_data)
 {
     XAppStatusPlugin *plugin = XAPP_STATUS_PLUGIN (user_data);
-    XfcePanelPlugin *panel_plugin = XFCE_PANEL_PLUGIN (plugin);
     StatusIcon *icon;
     gchar *key;
 
@@ -474,12 +467,6 @@ on_icon_removed (XAppStatusIconMonitor        *monitor,
     g_free (key);
 
     sort_icons (plugin);
-
-    xapp_status_plugin_size_changed (XFCE_PANEL_PLUGIN (plugin),
-                                            xfce_panel_plugin_get_size (panel_plugin));
-
-    xapp_status_plugin_screen_position_changed (XFCE_PANEL_PLUGIN (plugin),
-                                                       xfce_panel_plugin_get_screen_position (panel_plugin));
 }
 
 static void
