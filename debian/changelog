@@ -1,3 +1,22 @@
+xfce4-xapp-status-plugin (0.4.5) adrien; urgency=medium
+
+  [ Michael Webster ]
+  * .github/workflows: Add generate-test-packages trigger.
+  * debian/control: Add libxfce4ui-2-dev to build depends
+  * Small fixes, and avoid redundant status icon image reloads
+
+  [ Xuntao Chi ]
+  * Use panel row size for status icon sizing
+  * Lay out status icons in a panel row grid
+  * Ignore hidden status icons in panel layout
+  * Free status icon lookup keys on early returns
+  * Separate status icon content orientation
+
+  [ Clement Lefebvre ]
+  * l10n: Update POT
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 12 Nov 2026 11:28:00 +0000
+
 xfce4-xapp-status-plugin (0.4.4) zena; urgency=medium
 
   * l10n: Update translations
