@@ -8,71 +8,68 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-15 12:23+0100\n"
+"POT-Creation-Date: 2026-11-12 11:26+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: plugin/xapp-status-plugin.c:247 plugin/xapp-status-plugin.desktop.in:4
+#: plugin/xapp-status-plugin.c:479 plugin/xapp-status-plugin.desktop.in:3
+#: plugin/configure.glade:101
 msgid "XApp Status Plugin"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:252 plugin/xapp-status-plugin.desktop.in:5
+#: plugin/xapp-status-plugin.c:484 plugin/xapp-status-plugin.desktop.in:4
 msgid "Area where XApp Status icons appear"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:291
+#: plugin/configure.glade:16
 msgid "Use optimal size for panel"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:292 plugin/xapp-status-plugin.c:301
+#: plugin/configure.glade:21 plugin/configure.glade:63
 msgid "16px"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:293
+#: plugin/configure.glade:26 plugin/configure.glade:78
 msgid "22px"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:294 plugin/xapp-status-plugin.c:304
+#: plugin/configure.glade:31 plugin/configure.glade:83
 msgid "24px"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:295 plugin/xapp-status-plugin.c:305
+#: plugin/configure.glade:36 plugin/configure.glade:88
 msgid "32px"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:296 plugin/xapp-status-plugin.c:306
+#: plugin/configure.glade:41 plugin/configure.glade:93
 msgid "48px"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:300
+#: plugin/configure.glade:58
 msgid "10px"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:302
+#: plugin/configure.glade:68
 msgid "18px"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:303
+#: plugin/configure.glade:73
 msgid "20px"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:362
-msgid "About"
-msgstr ""
-
-#: plugin/xapp-status-plugin.c:373
+#: plugin/configure.glade:135
 msgid "Icon sizes"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:382
+#: plugin/configure.glade:157
 msgid "Color"
 msgstr ""
 
-#: plugin/xapp-status-plugin.c:416
+#: plugin/configure.glade:190
 msgid "Symbolic"
 msgstr ""
