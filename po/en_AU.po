@@ -1,0 +1,75 @@
+# English (Australia) translation for linuxmint
+# Copyright (c) 2026 Rosetta Contributors and Canonical Ltd 2026
+# This file is distributed under the same license as the linuxmint package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: linuxmint\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2026-11-12 11:26+0000\n"
+"PO-Revision-Date: 2026-01-29 21:24+0000\n"
+"Last-Translator: Nessie Johnstone <Unknown>\n"
+"Language-Team: English (Australia) <en_AU@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2026-11-16 12:00+0000\n"
+"X-Generator: Launchpad (build 72ba15af7e009b17d4aa1467977127ac8392a4de)\n"
+
+#: plugin/xapp-status-plugin.c:479 plugin/xapp-status-plugin.desktop.in:3
+#: plugin/configure.glade:101
+msgid "XApp Status Plugin"
+msgstr "XApp Status Plugin"
+
+#: plugin/xapp-status-plugin.c:484 plugin/xapp-status-plugin.desktop.in:4
+msgid "Area where XApp Status icons appear"
+msgstr "Area where XApp Status icons appear"
+
+#: plugin/configure.glade:16
+msgid "Use optimal size for panel"
+msgstr "Use optimal size for panel"
+
+#: plugin/configure.glade:21 plugin/configure.glade:63
+msgid "16px"
+msgstr "16px"
+
+#: plugin/configure.glade:26 plugin/configure.glade:78
+msgid "22px"
+msgstr "22px"
+
+#: plugin/configure.glade:31 plugin/configure.glade:83
+msgid "24px"
+msgstr "24px"
+
+#: plugin/configure.glade:36 plugin/configure.glade:88
+msgid "32px"
+msgstr "32px"
+
+#: plugin/configure.glade:41 plugin/configure.glade:93
+msgid "48px"
+msgstr "48px"
+
+#: plugin/configure.glade:58
+msgid "10px"
+msgstr "10px"
+
+#: plugin/configure.glade:68
+msgid "18px"
+msgstr "18px"
+
+#: plugin/configure.glade:73
+msgid "20px"
+msgstr "20px"
+
+#: plugin/configure.glade:135
+msgid "Icon sizes"
+msgstr "Icon sizes"
+
+#: plugin/configure.glade:157
+msgid "Color"
+msgstr "Colour"
+
+#: plugin/configure.glade:190
+msgid "Symbolic"
+msgstr "Symbolic"
