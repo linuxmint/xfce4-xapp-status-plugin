@@ -1,3 +1,9 @@
+xfce4-xapp-status-plugin (0.4.7) adrien; urgency=medium
+
+  * l10n: Update translations
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 25 Nov 2026 10:00:39 +0000
+
 xfce4-xapp-status-plugin (0.4.6) adrien; urgency=medium
 
   * l10n: Update translations
